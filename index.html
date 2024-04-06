@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katelyn and Damian's Wedding - Oct. 12, 2024 in Montara, CA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav class="top-menu" id="top-menu">
+            <ul>
+                <li><a href="#" onclick="showSection('our-story')">Our Story</a></li>
+                <li><a href="#" onclick="showSection('the-ring')">The Ring</a></li>
+                <li><a href="#" onclick="showSection('the-proposal')">The Proposal</a></li>
+                <li><a href="#" onclick="showSection('about-montara')">About Montara</a></li>
+                <li><a href="#" onclick="showSection('questions')">Questions</a></li>
+            </ul>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+    </header>
+    
+    <div class="splash" id="splash">
+        <div class="overlay"></div>
+        <div class="content" id="splash-content">
+            <h2 class="save-the-date">Save the Date!</h2>
+            <p class="event-details">Oct. 12, 2024 in Montara, CA</p>
+            <form id="email-form">
+                <input type="text" id="name" placeholder="Name">
+                <input type="email" id="email" placeholder="Email">
+                <button type="submit">Get Wedding Updates!</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="our-story" class="section">
+        <h2 class="save-the-date">New Year's Eve, 2008</h2>
+        <p>We met in the halls of our high schools, De La Salle and Carondelet, 
+            passing each other on the way to our respective sports practices and music shows.</p>
+        <p>But it was on New Year's Eve our Junior year that sparks began to fly. And soon, we became adventurers together,
+            going to citywide pillowfights and, most notably, lighthouses together (a tradition we carry on to this day!)
+        </p>
+        <img src="plane.png" alt="Plane" class="plane">
+        <p>After several years of long distance between our college campuses of Princeton and Berkeley, and with lots of extra
+            distance in between (summers in Australia, Spain, Nicaragua, and Mexico bookended our time apart - postcards aplenty!),
+            we finally moved in together in Washington, DC and eventually made our way back to the west (best) coast.
+        </p>
+    </div>
+
+    <div id="the-ring" class="section">
+        <h2 class="save-the-date">The Ring</h2>
+        <p>We had our ring custom made by the wonderful Carol at Arareity Jewelers in Sacramento. The ring is an homage to
+            heirloom rings from Damian's side of the family in Brittany, France.
+        </p>
+    </div>
+
+    <div id="the-proposal" class="section">
+        <h2 class="save-the-date">The Proposal</h2>
+        <p>Damian surprised Katelyn by proposing to her at the lighthouse in Manistee, Michigan. The location has a special 
+            significance because Katelyn's grandparents are originally from the nearby Grand Rapids - which is incidentally 
+            also where Damian's father had his first experience as an exchange student in the United States! Katelyn took some pictures with the ring 
+            at her grandma's childhood home to commemorate the moment.
+        </p>
+        <div class="carousel-container">
+            <button class="prev" onclick="prevSlide()">&#10094;</button>
+            <div class="carousel" id="carousel">
+            <img class="carousel-img" src="proposal1.jpg" alt="Proposal 1">
+            <img class="carousel-img" src="proposal2.jpg" alt="Proposal 2">
+            <img class="carousel-img" src="proposal3.jpg" alt="Proposal 3">
+            <img class="carousel-img" src="proposal4.jpg" alt="Proposal 4">
+            <img class="carousel-img" src="proposal5.jpg" alt="Proposal 5">
+        </div>
+        <button class="next" onclick="nextSlide()">&#10095;</button>
+    </div>
+    </div>
+    <div id="about-montara" class="section">
+        <h2 class="save-the-date">Welcome to the coast</h2>
+        <p>Montara is a small town off the coast of California, a little under a half hour south of San Francisco.
+            Damian and Katelyn chose this location because of the proximity to family and friends, but also because of well,
+            let's face it: the lighthouse!
+        </p>
+        <img src="flyer.png" alt="Flyer" class="flyer">
+        <p><i>Art courtesy of our good friend Charlie Kidd.</i>
+        </p>
+    </div>
+
+    <div id="questions" class="section">
+        <h2 class="save-the-date">Contact</h2>
+        <p>If you have any questions, feel free to send us an email <a href="mailto:ke.williams17@gmail.com">here</a>.</p>
+        <p> RSVP emails will be going out soon! Please add your email to the list so that we can keep you in the loop.
+            We can't wait to see you in the fall!
+        </p>
+    </div>
+    
+    <a href="#" id="logo-link">
+    <img src="logo.png" alt="Wedding Logo" class="fixed-logo">
+    </a>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('logo-link').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default behavior of anchor tag
+        window.location.reload(); // Reload the page
+        });
+    </script>
+</body>
+</html>

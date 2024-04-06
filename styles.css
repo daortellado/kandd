@@ -1,0 +1,251 @@
+/* Import the Beth Ellen font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Beth+Ellen&display=swap');
+/* Import the Playfair Display and Beth Ellen fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Beth+Ellen&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the body */
+}
+
+.splash {
+    height: 100vh; /* Set height to cover the entire viewport */
+    background-image: url('splash-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Add an overlay to make text more readable */
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 1; /* Ensure content is above overlay */
+}
+
+.top-menu {
+    position: absolute;
+    top: 10px; /* Adjust the vertical position as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Ensure menu is above content and overlay */
+}
+
+.top-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.top-menu ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.top-menu ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px; /* Adjust the font size as needed */
+}
+
+.top-menu ul li a:hover {
+    color: #ff6600;
+}
+
+.section {
+    display: none;
+}
+
+.fixed-logo {
+    position: fixed;
+    top: 40px; /* Adjust the vertical position below the menu as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Ensure logo is above content */
+    width: 150px; /* Adjust the width as needed */
+    height: auto;
+}
+
+/* Apply the Beth Ellen font to the "Save the Date" part */
+.save-the-date {
+    font-family: 'Beth Ellen', cursive; /* Apply the Beth Ellen font */
+    font-size: 24px; /* Adjust the font size as needed */
+    color: white;
+    margin-bottom: 10px; /* Adjust the margin as needed */
+}
+
+.event-details {
+    color: white;
+    font-size: 32px; /* Adjust the font size as needed */
+}
+
+/* Style the form */
+#email-form {
+    margin-top: 20px;
+    text-align: center; /* Center-align the form */
+}
+
+#email-form input[type="text"],
+#email-form input[type="email"] {
+    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the fields */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: calc(100% - 42px); /* Adjust the width to be slightly less than 100% */
+    background-color: rgba(255, 255, 255, 0.2); /* Adjust the transparency as needed */
+    color: white;
+    text-align: center; /* Center-align text in input fields */
+}
+
+#email-form input[type="text"]::placeholder,
+#email-form input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Adjust the transparency of placeholder text */
+    text-align: center; /* Center-align placeholder text */
+}
+
+#email-form button[type="submit"] {
+    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the button */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 102, 0, 0.8); /* Adjust the transparency as needed */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Add transition for smooth hover effect */
+    width: auto; /* Set width to auto */
+}
+
+#email-form button[type="submit"]:hover {
+    background-color: rgba(224, 85, 0, 0.8); /* Adjust the transparency for hover effect */
+}
+
+.plane {
+    max-width: 100px; /* Adjust the maximum width of the plane image */
+    height: auto;
+    margin-top: 20px; /* Adjust as needed */
+    display: block; /* Ensure the image is displayed as a block element */
+    margin-left: auto; /* Center-align the image horizontally */
+    margin-right: auto; /* Center-align the image horizontally */
+}
+
+.flyer {
+    max-width: 200px; /* Adjust the maximum width of the plane image */
+    height: auto;
+    margin-top: 20px; /* Adjust as needed */
+    display: block; /* Ensure the image is displayed as a block element */
+    margin-left: auto; /* Center-align the image horizontally */
+    margin-right: auto; /* Center-align the image horizontally */
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    width: 50%; /* Adjust the width as needed */
+    margin: auto; /* Center the carousel */
+}
+
+.carousel-img {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-right: 10px; /* Add some space between images */
+}
+
+.carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3; /* Ensure arrows are above carousel */
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.prev:hover, .next:hover {
+    color: #ff6600;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+/* Hide the hamburger menu button initially */
+.menu-toggle {
+    display: none;
+}
+
+/* Media query for smaller screens (max-width: 768px) */
+@media only screen and (max-width: 768px) {
+    .top-menu ul {
+        display: none; /* Hide the regular menu on smaller screens */
+    }
+
+    .menu-toggle {
+        display: block; /* Display the hamburger menu button */
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        border: none;
+        font-size: 24px;
+        color: white;
+        z-index: 2;
+    }
+
+    .menu-toggle:hover {
+        color: #ff6600;
+    }
+
+    .top-menu ul.show {
+        display: flex; /* Display the menu items as a flex container */
+        flex-direction: column; /* Stack the menu items vertically */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 1); /* Semi-transparent black with higher opacity */
+        z-index: 999; /* Ensure it's above all other elements */
+        padding: 20px; /* Add some padding */
+        box-sizing: border-box; /* Include padding in the width/height calculation */
+        justify-content: center; /* Center the menu items vertically */
+        align-items: center; /* Center the menu items horizontally */
+    }
+
+    .top-menu ul.show li {
+        margin-bottom: 20px; /* Add some spacing between menu items */
+        text-align: center;
+    }
+
+    .top-menu ul.show li a {
+        font-size: 24px; /* Increase the font size for better visibility */
+        color: white; /* Set the color of the menu items to white */
+    }
+}
