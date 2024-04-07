@@ -32,7 +32,7 @@ form.addEventListener('submit', function(event) {
     // Prepare data as JSON
     const data = { name, email };
 
-    fetch('https://script.google.com/macros/s/AKfycbw-gP5qNDI_Xw2_WioYmpt8X93On27xIKpzv9ziAZ3RKnBiXqdFCEA3RtGCXsiX5gr6XQ/exec', {
+    fetch('https://script.google.com/macros/s/1XyiIC5xZSUzp5TCVQeb_c11tr5j5_DfJQm3u4V1AgyrLtr4dtWDhXKlE/exec', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }
