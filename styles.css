@@ -152,6 +152,15 @@ body, html {
     margin-right: auto; /* Center-align the image horizontally */
 }
 
+.ring {
+    max-width: 400px; /* Adjust the maximum width of the plane image */
+    height: auto;
+    margin-top: 20px; /* Adjust as needed */
+    display: block; /* Ensure the image is displayed as a block element */
+    margin-left: auto; /* Center-align the image horizontally */
+    margin-right: auto; /* Center-align the image horizontally */
+}
+
 .carousel {
     display: flex;
     overflow-x: auto;
