@@ -25,9 +25,9 @@
         <div class="content" id="splash-content">
             <h2 class="save-the-date">Save the Date!</h2>
             <p class="event-details">Oct. 12, 2024 in Montara, CA</p>
-            <form id="email-form">
-                <input type="text" id="name" placeholder="Name">
-                <input type="email" id="email" placeholder="Email">
+            <form id="email-form" method="POST" action="https://script.google.com/macros/s/AKfycbzxwVmVHzY-7dHCD21eT9p7c-VcqaTr7p0ePs2_-CpHJUbyNYSpd7azRnrivVv92eAIsA/exec">
+                <input name="Name" type="text" id="name" placeholder="Name" required>
+                <input name="Email" type="email" id="email" placeholder="Email" required>
                 <button type="submit">Get Wedding Updates!</button>
             </form>
         </div>
@@ -103,11 +103,38 @@
     <img src="logo.png" alt="Wedding Logo" class="fixed-logo">
     </a>
 
+    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
     <script src="script.js"></script>
     <script>
         document.getElementById('logo-link').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent default behavior of anchor tag
         window.location.reload(); // Reload the page
+        });
+        const form = document.getElementById('email-form');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        loadingSpinner.style.display = 'flex'; // Show the loading spinner
+
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', event.target.action, true);
+        xhr.onload = function() {
+            loadingSpinner.style.display = 'none'; // Hide the loading spinner
+
+            if (xhr.status === 200 && xhr.responseText === 'success') {
+            alert('Thank you! Your submission has been received.');
+            form.reset();
+            } else {
+            alert('Oops! Something went wrong. Please try again later.');
+            }
+        };
+        xhr.send(formData);
         });
     </script>
 </body>
