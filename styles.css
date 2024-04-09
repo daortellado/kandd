@@ -37,14 +37,17 @@ body, html {
     z-index: 1; /* Ensure content is above overlay */
 }
 
+/* Regular styling for top menu */
 .top-menu {
     position: absolute;
     top: 10px; /* Adjust the vertical position as needed */
-    left: 50%;
-    transform: translateX(-50%);
+    left: 50%; /* Align menu to the center */
+    transform: translateX(-50%); /* Center menu horizontally */
     z-index: 2; /* Ensure menu is above content and overlay */
+    width: max-content;
 }
 
+/* Regular styling for top menu items */
 .top-menu ul {
     list-style-type: none;
     padding: 0;
@@ -66,6 +69,7 @@ body, html {
     color: #ff6600;
 }
 
+
 .section {
     display: none;
 }
@@ -73,7 +77,8 @@ body, html {
 .fixed-logo {
     position: fixed;
     top: 40px; /* Adjust the vertical position below the menu as needed */
-    left: 33vw; /* Adjust the left position as needed */
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2; /* Ensure logo is above content */
     width: 150px; /* Adjust the width as needed */
     height: auto;
@@ -212,14 +217,6 @@ body, html {
 
 /* Media query for smaller screens (max-width: 768px) */
 @media only screen and (max-width: 768px) {
-    .top-menu ul {
-        display: none; /* Hide the regular menu on smaller screens */
-    }
-
-    .top-menu {
-        top: 0;
-        width: 100vh;
-    }
 
     .menu-toggle {
         display: block; /* Display the hamburger menu button */
@@ -239,6 +236,18 @@ body, html {
 
     .content {
         width: 100vw;
+    }
+
+    .top-menu {
+        left: 0; /* Align menu to the left edge */
+        top: 0;
+        width: 100%; /* Set width to full width */
+        transform: none; /* Remove horizontal translation */
+        text-align: center; /* Center-align the menu items */
+    }
+
+    .top-menu ul {
+        display: none; /* Hide the regular menu on smaller screens */
     }
 
     .top-menu ul.show {
@@ -265,6 +274,10 @@ body, html {
         font-size: 24px; /* Increase the font size for better visibility */
         color: white; /* Set the color of the menu items to white */
         margin-left: 20px;
+    }
+
+    .fixed-logo {
+        left: 50vw; /* Adjust the left position as needed */
     }
 }
 

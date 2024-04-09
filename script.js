@@ -4,6 +4,7 @@ const menuToggle = document.querySelector('.menu-toggle');
 const splashContent = document.getElementById('splash-content');
 const form = document.getElementById('email-form');
 const loadingSpinner = document.getElementById('loading-spinner');
+const logo = document.querySelector('.fixed-logo'); // Add this line to cache the logo element
 
 // Toggle menu function
 function toggleMenu() {
@@ -58,6 +59,11 @@ menu.addEventListener('click', function(event) {
     if (event.target.tagName === 'A') {
         toggleMenu();
     }
+});
+
+// Event listener for logo click to reload the page
+logo.addEventListener('click', function() {
+    location.reload();
 });
 
 // DOMContentLoaded event listener
