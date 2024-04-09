@@ -1,77 +1,90 @@
+// Cache frequently accessed elements
+const menu = document.querySelector('.top-menu ul');
+const menuToggle = document.querySelector('.menu-toggle');
+const splashContent = document.getElementById('splash-content');
+const form = document.getElementById('email-form');
+const loadingSpinner = document.getElementById('loading-spinner');
+
+// Toggle menu function
 function toggleMenu() {
-    const menu = document.querySelector('.top-menu ul');
     menu.classList.toggle('show');
-
-    // Add event listeners to menu items (within the toggleMenu function)
-    document.querySelectorAll('.top-menu ul.show li a').forEach(link => {
-        link.addEventListener('click', () => {
-            // Hide the logo on small screens
-            if (window.innerWidth <= 768) {
-                hideLogo();
-            }
-            toggleMenu(); // Also toggle the menu
-        });
-    });
 }
 
-// Function to hide the logo
-function hideLogo() {
-    document.querySelector('.fixed-logo').style.display = 'none';
-}
-
-//section logic
-
+// Show section function
 function showSection(sectionId) {
-    const splashContent = document.getElementById('splash-content');
     const section = document.getElementById(sectionId);
-    // Clear splash content
-    splashContent.innerHTML = '';
-    // Append section content to splash
-    const sectionContent = section.innerHTML;
-    splashContent.innerHTML = sectionContent;
-    // Hide the original section (this line is added)
+    splashContent.innerHTML = section.innerHTML;
     section.style.display = 'none';
-    // Check if the sectionId is 'the-proposal' and initialize the carousel
+
     if (sectionId === 'the-proposal') {
-        // Initialize carousel
         showSlides();
     }
 }
 
-// Carousel
+// Submit form event listener
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    loadingSpinner.style.display = 'flex';
+
+    const formData = new FormData(form);
+    fetch(form.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        loadingSpinner.style.display = 'none';
+        if (data === 'success') {
+            alert('Thank you! Your submission has been received.');
+            form.reset();
+        } else {
+            alert('Oops! Something went wrong. Please try again later.');
+        }
+    })
+    .catch(error => {
+        loadingSpinner.style.display = 'none';
+        console.error('Error:', error);
+        alert('Oops! Something went wrong. Please try again later.');
+    });
+});
+
+// Event listener for menu toggle button
+menuToggle.addEventListener('click', function() {
+    toggleMenu();
+});
+
+// Event delegation for menu item clicks
+menu.addEventListener('click', function(event) {
+    if (event.target.tagName === 'A') {
+        toggleMenu();
+    }
+});
+
+// DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function () {
+    totalSlides = document.querySelectorAll('.carousel-img').length;
+    showSlides();
+});
+
+// Carousel logic
 let slideIndex = 1;
 let totalSlides;
 
-// Function to show the next slide in the carousel
 function nextSlide() {
     slideIndex++;
     if (slideIndex > totalSlides) slideIndex = 1;
     showSlides();
 }
 
-// Function to show the previous slide in the carousel
 function prevSlide() {
     slideIndex--;
     if (slideIndex < 1) slideIndex = totalSlides;
     showSlides();
 }
 
-// Function to show slides
 function showSlides() {
-    const slides = document.getElementsByClassName("carousel-img");
-    for (let i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";
-    }
-    slides[slideIndex - 1].style.display = "block";
+    const slides = document.querySelectorAll('.carousel-img');
+    slides.forEach((slide, index) => {
+        slide.style.display = (index === slideIndex - 1) ? 'block' : 'none';
+    });
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    const carousel = document.querySelector('.carousel');
-    const slides = document.getElementsByClassName("carousel-img");
-    totalSlides = slides.length;
-    // Initialize carousel
-    showSlides();
-    // Event listeners for prev and next buttons
-    document.querySelector('.prev').addEventListener('click', prevSlide);
-    document.querySelector('.next').addEventListener('click', nextSlide);
-});

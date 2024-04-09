@@ -17,7 +17,7 @@
                 <li><a href="#" onclick="showSection('questions')">Questions</a></li>
             </ul>
         </nav>
-        <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+        <button class="menu-toggle" id="menu-toggle">&#9776;</button>
     </header>
     
     <div class="splash" id="splash">
@@ -108,34 +108,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        document.getElementById('logo-link').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent default behavior of anchor tag
-        window.location.reload(); // Reload the page
-        });
-        const form = document.getElementById('email-form');
-        const loadingSpinner = document.getElementById('loading-spinner');
-
-        form.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        loadingSpinner.style.display = 'flex'; // Show the loading spinner
-
-        const formData = new FormData(form);
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', event.target.action, true);
-        xhr.onload = function() {
-            loadingSpinner.style.display = 'none'; // Hide the loading spinner
-
-            if (xhr.status === 200 && xhr.responseText === 'success') {
-            alert('Thank you! Your submission has been received.');
-            form.reset();
-            } else {
-            alert('Oops! Something went wrong. Please try again later.');
-            }
-        };
-        xhr.send(formData);
-        });
-    </script>
 </body>
 </html>
