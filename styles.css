@@ -325,8 +325,20 @@ body, html {
     position: relative; /* Add this */
   }
 
+#logo-container {
+    display: block;
+}
+
 /* Media query for smaller screens (max-width: 768px) */
 @media only screen and (max-width: 768px) {
+
+    .top-menu ul.show ~ #logo-container {
+        display: block !important;
+    }
+
+    #logo-container {
+        display: block;
+    }
 
     .tab-container {
         flex-direction: column;
@@ -416,6 +428,11 @@ body, html {
     .fixed-logo {
         left: 50vw; /* Adjust the left position as needed */
     }
+
+    .tab-content {
+        height: 40vh; /* Set a fixed height or use vh units */
+        overflow-y: auto; /* Ensure overflow is set */
+      }
 }
 
 .loading-spinner {

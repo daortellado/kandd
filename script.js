@@ -1,56 +1,60 @@
-// Cache frequently accessed elements
 const menu = document.querySelector('.top-menu ul');
 const menuToggle = document.querySelector('.menu-toggle');
 const splashContent = document.getElementById('splash-content');
 const form = document.getElementById('email-form');
 const loadingSpinner = document.getElementById('loading-spinner');
+const logoContainer = document.getElementById('logo-container');
 const logo = document.querySelector('.fixed-logo');
-const faq = document.getElementById('faq');
 
-if (faq) {
-    faq.addEventListener('click', function(event) {
-        console.log('Event listener called');
-        if (event.target.classList.contains('faq-question')) {
-            console.log('FAQ question clicked');
-            toggleFaqAnswer(event);
-        }
-    });
-} else {
-    console.log('FAQ element not found');
-}
-
-// Call the function when the section changes
-// Assuming you have a function to handle section changes
-function onSectionChange(section) {
-  toggleLogo(section);
-}
+// Set initial logo visibility on page load (show logo by default)
+document.addEventListener('DOMContentLoaded', function() {
+  logoContainer.style.display = 'block';
+});
 
 // Toggle menu function
 function toggleMenu() {
-    menu.classList.toggle('show');
+  menu.classList.toggle('show');
+  logoContainer.style.display = menu.classList.contains('show') ? 'block' : 'none';
 }
 
 // Show section function
 function showSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    splashContent.innerHTML = section.innerHTML;
-    section.style.display = 'none';
+  const section = document.getElementById(sectionId);
+  splashContent.innerHTML = section.innerHTML;
+  section.style.display = 'none';
 
-    if (sectionId === 'the-proposal') {
-        showSlides();
-    }
+  if (window.innerWidth <= 768) {
     if (sectionId === 'all-the-details') {
-        if (window.innerWidth <= 768) { // Check screen size
-            document.getElementById('logo-container').style.display = 'none';
-            document.querySelector('.content').classList.add('details-selected');
-        }
+      document.querySelector('.content').classList.add('details-selected');
     } else {
-        if (window.innerWidth <= 768) { // Check screen size
-            document.getElementById('logo-container').style.display = 'block';
-            document.querySelector('.content').classList.remove('details-selected');
+      document.querySelector('.content').classList.remove('details-selected');
+    }
+    // No need to explicitly hide the logo here, it's handled by toggleMenu
+  } else {
+    logoContainer.style.display = 'block';
+  }
+
+  if (sectionId === 'the-proposal') {
+    showSlides();
+  }
+}
+
+// Event listener for menu toggle button
+menuToggle.addEventListener('click', toggleMenu);
+
+// Event listener for logo click to reload the page
+logo.addEventListener('click', function() {
+    location.reload();
+});
+
+// Event delegation for menu item clicks
+menu.addEventListener('click', function(event) {
+    if (event.target.tagName === 'A') {
+        if (window.innerWidth <= 768) {
+            toggleMenu();
         }
     }
-}
+});
 
 // Submit form event listener
 form.addEventListener('submit', function(event) {
@@ -77,21 +81,6 @@ form.addEventListener('submit', function(event) {
         console.error('Error:', error);
         alert('Oops! Something went wrong. Please try again later.');
     });
-});
-
-// Event listener for menu toggle button
-menuToggle.addEventListener('click', toggleMenu);
-
-// Event delegation for menu item clicks
-menu.addEventListener('click', function(event) {
-    if (event.target.tagName === 'A') {
-        toggleMenu();
-    }
-});
-
-// Event listener for logo click to reload the page
-logo.addEventListener('click', function() {
-    location.reload();
 });
 
 // Carousel logic
@@ -145,10 +134,7 @@ function showTab(tabId, event) {
 }
 
 function toggleFaqAnswer(event) {
-    console.log('Toggle FAQ answer called');
-    console.log(event.target); // Log the element that was clicked
     var answer = event.target.nextElementSibling;
-    console.log(answer); // Log the next element sibling
 
     // Close all other answers
     var allAnswers = document.querySelectorAll('.faq-answer');
@@ -161,10 +147,9 @@ function toggleFaqAnswer(event) {
 }
 
 // Event delegation for FAQ questions
+const faq = document.getElementById('faq');
 faq.addEventListener('click', function(event) {
-    console.log('Event listener called');
     if (event.target.classList.contains('faq-question')) {
-        console.log('FAQ question clicked');
         toggleFaqAnswer(event);
     }
 });
@@ -172,7 +157,6 @@ faq.addEventListener('click', function(event) {
 // DOMContentLoaded event listener
 document.addEventListener('click', function(event) {
     if (event.target.classList.contains('faq-question')) {
-        console.log('FAQ question clicked');
         toggleFaqAnswer(event);
     }
 });
