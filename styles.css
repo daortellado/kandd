@@ -3,6 +3,113 @@
 /* Import the Playfair Display and Beth Ellen fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Beth+Ellen&display=swap');
 
+.tab-container {
+    height: 50vh;
+    width: 800px;
+    display: flex;
+    flex-direction: row;
+    max-width: 800px;
+    margin: 0 auto;
+    justify-content: space-between;
+  }
+  
+  .tabs {
+    flex: 0 0 20%;
+    min-width: 0; 
+    padding: 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+    width: 100%; 
+    text-align: center;
+    min-width: 0;
+}
+
+.tab:hover, .tab.active {
+    background-color: #ff6600;
+    color: white;
+}
+
+.tab-content-wrapper {
+    flex: 0 0 80%; 
+    flex-basis: 80%;
+    padding: 20px;
+    overflow-y: auto;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  
+  .tab-content {
+    display: none;
+    padding: 20px;
+    height: 100%;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }  
+
+.faq-question {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f0f0f0;
+    margin-bottom: 5px;
+}
+
+.faq-answer {
+    display: none;
+    padding: 10px;
+    border-left: 2px solid #ff6600;
+    margin-bottom: 10px;
+    transition: height 0.3s ease-out; /* Add transition effect */
+}
+
+.faq-answer.show {
+    display: block;
+}
+
+.tab-content.show {
+    display: block;
+}
+
+.faq-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.details-selected {
+    /* styles here will only be applied when the "All the Details" section is selected on mobile devices */
+    position: fixed !important;
+    top: 20px !important; /* or any other styles you need */
+}
+
+@media only screen and (max-width: 768px) {
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+}
+
 body, html {
     margin: 0;
     padding: 0;
@@ -68,7 +175,6 @@ body, html {
 .top-menu ul li a:hover {
     color: #ff6600;
 }
-
 
 .section {
     display: none;
@@ -215,8 +321,39 @@ body, html {
     display: none;
 }
 
+.section {
+    position: relative; /* Add this */
+  }
+
 /* Media query for smaller screens (max-width: 768px) */
 @media only screen and (max-width: 768px) {
+
+    .tab-container {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+        position: fixed;
+        z-index: 1;
+      }
+      .tabs {
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .tab {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 14px; /* Reduce font size */
+        padding: 10px; /* Reduce padding */
+      }
+      .tab-content-wrapper {
+        width: 100%;
+        padding: 10px; /* Reduce padding */
+      }
 
     .menu-toggle {
         display: block; /* Display the hamburger menu button */

@@ -14,7 +14,7 @@
                 <li><a href="#" onclick="showSection('the-ring')">The Ring</a></li>
                 <li><a href="#" onclick="showSection('the-proposal')">The Proposal</a></li>
                 <li><a href="#" onclick="showSection('about-montara')">About Montara</a></li>
-                <li><a href="#" onclick="showSection('questions')">Questions</a></li>
+                <li><a href="#" onclick="showSection('all-the-details')">All the Details</a></li>
             </ul>
         </nav>
         <button class="menu-toggle" id="menu-toggle">&#9776;</button>
@@ -91,18 +91,130 @@
         </p>
     </div>
 
-    <div id="questions" class="section">
-        <h2 class="save-the-date">Contact</h2>
-        <p>If you have any questions, feel free to send us an email <a href="mailto:ke.williams17@gmail.com">here</a>.</p>
-        <p> RSVP emails will be going out soon! Please add your email to the list so that we can keep you in the loop.
-            We can't wait to see you in the fall!
-        </p>
-    </div>
-    
-    <a href="#" id="logo-link">
-    <img src="logo.png" alt="Wedding Logo" class="fixed-logo">
-    </a>
+    <div id="all-the-details" class="section">
+        <h2 class="save-the-date">All the Details</h2>
 
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <div class="tabs">
+                <button class="tab" onclick="showTab('schedule', event)">Schedule</button>
+                <button class="tab" onclick="showTab('accommodations', event)">Accommodations & Transportation</button>
+                <button class="tab" onclick="showTab('faq', event)">FAQ</button>
+                <button class="tab" onclick="showTab('registry', event)">Registry</button>
+                <button class="tab" onclick="showTab('todo', event)">To Do</button>
+                <button class="tab" onclick="showTab('eat-drink', event)">Eat & Drink</button>
+            </div>            
+            
+            <!-- Tab Content -->
+            <div class="tab-content-wrapper">
+            <div class="tab-content" id="schedule">
+                <p>
+                    1pm - 2:30pm: Shuttles to Venue<br>
+                    3pm: Ceremony and Cocktail Hour<br>
+                    5pm: Toasts<br>
+                    5:30pm: Dinner<br>
+                    6:30pm: Dancing<br>
+                    8:30pm-10pm: Shuttles to Hotels
+                </p>
+            </div>
+            <div class="tab-content" id="accommodations" style="display: none;">
+                <h4>Hotels</h4>
+                <p>Oceano Hotel: Call 6507265400 and mention the "Ortellado-Williams Wedding Room Block” Block rooms available until August 30th ($389/night)</p>
+                <p>Quality Inn at Half Moon Bay/Miramar: No room block so book quickly. (starting at $175/night)</p>
+                <p>There are also many other hotels and AirBnBs around the Montara area.</p>
+                <h4>Shuttle</h4>
+                <p>THERE IS NO PARKING AVAILABLE AT THE VENUE. Shuttles will provide transport from the Oceano Hotel and the Quality Inn at Halfmoon Bay to the venue. Check your emails for the shuttle schedule closer to the date. If you are staying elsewhere, driving in, or taking a taxi, please head to the Oceano Hotel parking lot to catch the shuttle.</p>
+            </div>
+            <div class="tab-content" id="faq" style="display: none;">
+                <ul class="faq-list">
+                    <li>
+                        <button class="faq-question">Are children invited?</button>
+                        <div class="faq-answer">
+                            <p>Due to the space and safety limitations of the venue, we are not having children at the ceremony or reception. Please reach out if you would like assistance finding suitable childcare.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">Will the wedding be indoors or outdoors?</button>
+                        <div class="faq-answer">
+                            <p>The ceremony and reception are at the same location and entirely outdoors. While the weather should be mild and heat lamps are provided, it may be chilly later in the evening so please bring some layers.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">What about the weather?</button>
+                        <div class="faq-answer">
+                            <p>This time of year is typically mild in the 65F-70F range. The venue is outdoors and while there will be heat lamps and firepits, we recommend bringing some layers (the California way!)</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">What's the dress code?</button>
+                        <div class="faq-answer">
+                            <p>Practical cocktail (but don't let me stop you from going all out!). The terrain is multilevel, grassy, sandy, and rough in spots -- please wear comfortable footwear or bring a pair of dancing sneakers!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">How do I get to and from the venue?</button>
+                        <div class="faq-answer">
+                            <p>Please see the Accommodations & Transportation tab for more info.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">What if I need to leave early or forgot a very important item at the hotel?</button>
+                        <div class="faq-answer">
+                            <p>There will be a courtesy car for any non-shuttle transportation.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">Will there be an open bar?</button>
+                        <div class="faq-answer">
+                            <p>Obviously!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button class="faq-question">Can I bring a plus one?</button>
+                        <div class="faq-answer">
+                            <p>If your invite link does not include a plus one, please reach out to inquire.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tab-content" id="registry" style="display: none;">
+                <p>To be updated.</p>
+            </div>
+            <div class="tab-content" id="todo" style="display: none;">
+                <h4>All the beaches!</h4>
+                <p>From Pacifica, Montara, and Half Moon Bay</p>
+                <h4>All the trails!</h4>
+                <ul>
+                    <li>Devil's Slide Trail (and Devil's Bunker): The old highway route before they built the tunnels -- stunning views, bench seating available, and paved. About 1.3 miles one way.</li>
+                    <li>Grey Whale Cove Trail: Moderate difficulty trail with some elevation. Amazing ocean views overlooking Highway 1. Keep your eyes peeled for migrating whales!</li>
+                    <li>JV Fitzgerald Marine Reserve: A favorite place to check out the tide pools - check the tide levels if you'd like to visit closer to low tide. The Bluff Trail takes you right along the ocean with outlook points where you can often find the sea lions basking on the beaches.</li>
+                </ul>
+            </div>
+            <div class="tab-content" id="activities" style="display: none;">
+                <ul>
+                    <li>Half Moon Bay Golf Links: If golf's your thing, you can check out this oceanfront course designed by Arnold Palmer</li>
+                    <li>Coastside Farmer’s Market: Check out the farmer's market on Saturday morning at Shoreline Station and then pop over to Main Street for more walking, shopping and dining.</li>
+                    <li>Montara Lighthouse: "...[Insert interesting description about the Montara Lighthouse here. You can use the information you provided earlier]"</li>
+                </ul>
+            </div>
+            <div class="tab-content" id="eat-drink" style="display: none;">
+                <ul>
+                    <li>Barbara's Fishtrap: Truly the best fish & chips around</li>
+                    <li>Sam's Chowder House: Take your lobster roll to the beach</li>
+                    <li>Old Princeton Landing (OPL): A bar and grill in Princeton-by-the-Sea. Likely where we'll all end up late on Saturday night...</li>
+                    <li>La Costanera: Delicious Peruvian food</li>
+                    <li>Taco Bell Cantina: The classiest Taco Bell you'll ever visit plopped directly on the beach in Pacifica</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="logo-container">
+    <a href="#" id="logo-link">
+    <img src="logo.png" alt="Wedding Logo" class="fixed-logo" id="logo">
+    </a>
+    </div>
     <div id="loading-spinner" class="loading-spinner" style="display: none;">
         <div class="spinner"></div>
     </div>
