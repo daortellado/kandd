@@ -131,6 +131,16 @@ function showTab(tabId, event) {
             tabLink.classList.add('active');
         }
     }
+
+    // Event delegation for FAQ questions (moved inside showTab)
+    const faq = document.getElementById('faq');
+    if (faq) {
+        faq.addEventListener('click', function(event) {
+            if (event.target.classList.contains('faq-question')) {
+                toggleFaqAnswer(event);
+            }
+        });
+    }
 }
 
 function toggleFaqAnswer(event) {
@@ -145,21 +155,6 @@ function toggleFaqAnswer(event) {
     // Toggle the current answer
     answer.classList.toggle('show');
 }
-
-// Event delegation for FAQ questions
-const faq = document.getElementById('faq');
-faq.addEventListener('click', function(event) {
-    if (event.target.classList.contains('faq-question')) {
-        toggleFaqAnswer(event);
-    }
-});
-
-// DOMContentLoaded event listener
-document.addEventListener('click', function(event) {
-    if (event.target.classList.contains('faq-question')) {
-        toggleFaqAnswer(event);
-    }
-});
 
 // Show the default tab on page load
 showTab('schedule'); // Pass the default tab ID
