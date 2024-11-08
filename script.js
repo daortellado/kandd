@@ -64,7 +64,7 @@ async function getPhotosInDirectory(directory) {
             
             const photo = {
                 src: `./${directory}/full/${fullFilename}.png`,
-                thumb: `./${directory}/thumbs/${filename}.png`, // Use original filename for thumb
+                thumb: `./${directory}/thumbs/${filename}_thumb.png`, // Use original filename for thumb
                 width: directory === 'photos' ? 800 : 600,
                 height: directory === 'photos' ? 600 : 900,
                 alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
