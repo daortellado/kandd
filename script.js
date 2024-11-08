@@ -61,7 +61,7 @@ async function getPhotosInDirectory(directory) {
         const photos = data[directory].files.map(filename => {
             const photo = {
                 src: `./${directory}/full/${filename}.png`,
-                thumb: `./${directory}/thumbs/${filename}.png`,
+                thumb: `./${directory}/thumbs/${filename}_thumb.png`,
                 width: directory === 'photos' ? 800 : 600,
                 height: directory === 'photos' ? 600 : 900,
                 alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
