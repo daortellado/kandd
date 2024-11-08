@@ -53,19 +53,26 @@ async function getPhotosInDirectory(directory) {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
-        // Add error checking for data structure
         if (!data || !data[directory] || !data[directory].files) {
             console.log('Data structure:', data);
             return [];
         }
         
-        return data[directory].files.map(filename => ({
-            src: `./${directory}/full/${filename}.png`,
-            thumb: `./${directory}/thumbs/${filename}_thumb.png`,
-            width: directory === 'photos' ? 800 : 600,
-            height: directory === 'photos' ? 600 : 900,
-            alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
-        }));
+        const photos = data[directory].files.map(filename => {
+            const photo = {
+                src: `./${directory}/full/${filename}.png`,
+                thumb: `./${directory}/thumbs/${filename}_thumb.png`,
+                width: directory === 'photos' ? 800 : 600,
+                height: directory === 'photos' ? 600 : 900,
+                alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
+            };
+            
+            // Debug log each photo object
+            console.log('Created photo object:', photo);
+            return photo;
+        });
+        
+        return photos;
     } catch (error) {
         console.error(`Error loading ${directory}:`, error);
         return [];
@@ -105,7 +112,6 @@ function setupInfiniteScroll() {
         });
     }, options);
 
-    // Observe loading trigger elements
     ['wedding', 'photobooth'].forEach(type => {
         const loadingTrigger = document.createElement('div');
         loadingTrigger.className = 'loading-trigger';
@@ -140,14 +146,24 @@ async function loadMorePhotos(type) {
         
         // Load image
         const img = new Image();
+        
+        // Debug log the image path
+        console.log('Loading thumbnail:', photo.thumb);
+        
+        img.onload = () => {
+            console.log('Thumbnail loaded successfully:', photo.thumb);
+            placeholder.remove(); // Remove instead of just hiding
+            item.appendChild(img);
+        };
+
+        img.onerror = (e) => {
+            console.error('Error loading thumbnail:', photo.thumb, e);
+            placeholder.textContent = 'Error loading image';
+        };
+
         img.src = photo.thumb;
         img.alt = photo.alt;
         img.loading = 'lazy';
-        
-        img.onload = () => {
-            placeholder.style.display = 'none';
-            item.appendChild(img);
-        };
         
         item.addEventListener('click', () => openPhotoSwipe(i, photos));
         fragment.appendChild(item);
