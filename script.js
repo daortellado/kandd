@@ -53,9 +53,15 @@ async function getPhotosInDirectory(directory) {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
+        // Add error checking for data structure
+        if (!data || !data[directory] || !data[directory].files) {
+            console.log('Data structure:', data);
+            return [];
+        }
+        
         return data[directory].files.map(filename => ({
-            src: `./${directory}/full/${filename}.jpg`,
-            thumb: `./${directory}/thumbs/${filename}_thumb.jpg`,
+            src: `./${directory}/full/${filename}.png`,
+            thumb: `./${directory}/thumbs/${filename}_thumb.png`,
             width: directory === 'photos' ? 800 : 600,
             height: directory === 'photos' ? 600 : 900,
             alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
@@ -66,18 +72,21 @@ async function getPhotosInDirectory(directory) {
     }
 }
 
-// Gallery initialization
 async function initGalleries() {
-    // Load and sort photo lists first
-    weddingPhotos = await getPhotosInDirectory('photos');
-    photoboothPhotos = await getPhotosInDirectory('photobooth');
-    
-    console.log(`Loaded ${weddingPhotos.length} wedding photos and ${photoboothPhotos.length} photobooth photos`);
-    
-    // Then set up infinite scroll and load initial photos
-    setupInfiniteScroll();
-    loadMorePhotos('wedding');
-    loadMorePhotos('photobooth');
+    try {
+        weddingPhotos = await getPhotosInDirectory('wedding');
+        photoboothPhotos = await getPhotosInDirectory('photobooth');
+        
+        console.log(`Loaded ${weddingPhotos.length} wedding photos and ${photoboothPhotos.length} photobooth photos`);
+        
+        if (weddingPhotos.length > 0 || photoboothPhotos.length > 0) {
+            setupInfiniteScroll();
+            loadMorePhotos('wedding');
+            loadMorePhotos('photobooth');
+        }
+    } catch (error) {
+        console.error('Error initializing galleries:', error);
+    }
 }
 
 // Infinite scroll setup
@@ -189,10 +198,11 @@ function openPhotoSwipe(index, photos) {
         dataSource: photos,
         index: index,
         closeOnVerticalDrag: true,
-        clickToCloseNonZoomable: true
+        clickToCloseNonZoomable: true,
+        pswpModule: window.PhotoSwipe
     };
 
-    const lightbox = new PhotoSwipe(options);
+    const lightbox = new window.PhotoSwipe(options);
     lightbox.init();
     
     lightbox.on('destroy', () => {
