@@ -49,39 +49,17 @@ function checkPassword() {
 
 async function getPhotosInDirectory(directory) {
     try {
-        const response = await fetch(`./${directory}/thumbs/`);  // Changed to relative path
+        const response = await fetch('./photo-list.json');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const files = await response.text();
+        const data = await response.json();
         
-        // Different patterns for wedding photos vs photobooth
-        const pattern = directory === 'photos' 
-            ? /2024_10_12_KatelynDamianWedding-\d+_thumb\.jpg/g
-            : /collage_[0-9]+_thumb\.jpg/g;
-        
-        const thumbFiles = files.match(pattern) || [];
-        
-        // Sort files based on the numerical portion
-        const sortedFiles = thumbFiles.sort((a, b) => {
-            const getNumber = (filename) => {
-                if (directory === 'photos') {
-                    return parseInt(filename.match(/Wedding-(\d+)/)[1]);
-                } else {
-                    return parseInt(filename.match(/collage_(\d+)/)[1]);
-                }
-            };
-            return getNumber(a) - getNumber(b);
-        });
-
-        return sortedFiles.map(thumb => {
-            const fullImage = thumb.replace('_thumb', '');
-            return {
-                src: `./${directory}/full/${fullImage}`,     // Changed to relative path
-                thumb: `./${directory}/thumbs/${thumb}`,      // Changed to relative path
-                width: directory === 'photos' ? 800 : 600,
-                height: directory === 'photos' ? 600 : 900,
-                alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
-            };
-        });
+        return data[directory].files.map(filename => ({
+            src: `./${directory}/full/${filename}.jpg`,
+            thumb: `./${directory}/thumbs/${filename}_thumb.jpg`,
+            width: directory === 'photos' ? 800 : 600,
+            height: directory === 'photos' ? 600 : 900,
+            alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
+        }));
     } catch (error) {
         console.error(`Error loading ${directory}:`, error);
         return [];
