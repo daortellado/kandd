@@ -59,12 +59,10 @@ async function getPhotosInDirectory(directory) {
         }
         
         const photos = data[directory].files.map(filename => {
-            // Remove '_thumb' from the filename for the full-size version
-            const fullFilename = filename.replace('_thumb', '');
-            
+            // filename is already the base name (e.g., "collage_20241012102352")
             const photo = {
-                src: `./${directory}/full/${fullFilename}.png`,
-                thumb: `./${directory}/thumbs/${filename}_thumb.png`, // Use original filename for thumb
+                src: `./${directory}/full/${filename}.png`,            // e.g., ./photobooth/full/collage_20241012102352.png
+                thumb: `./${directory}/thumbs/${filename}_thumb.png`,   // e.g., ./photobooth/thumbs/collage_20241012102352_thumb.png
                 width: directory === 'photos' ? 800 : 600,
                 height: directory === 'photos' ? 600 : 900,
                 alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
