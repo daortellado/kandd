@@ -2,9 +2,9 @@ const PHOTOS_PER_PAGE = 20;
 
 let weddingPhotos = [];
 let photoboothPhotos = [];
-let currentGalleryType = 'photos';
+let currentGalleryType = 'wedding';
 let currentPage = {
-    photos: 0,
+    wedding: 0,
     photobooth: 0
 };
 let isLoading = false;
@@ -79,14 +79,14 @@ async function getPhotosInDirectory(directory) {
 
 async function initGalleries() {
     try {
-        weddingPhotos = await getPhotosInDirectory('photos');
+        weddingPhotos = await getPhotosInDirectory('wedding');
         photoboothPhotos = await getPhotosInDirectory('photobooth');
         
         console.log(`Loaded ${weddingPhotos.length} wedding photos and ${photoboothPhotos.length} photobooth photos`);
         
         if (weddingPhotos.length > 0 || photoboothPhotos.length > 0) {
             setupInfiniteScroll();
-            loadMorePhotos('photos');
+            loadMorePhotos('wedding');
             loadMorePhotos('photobooth');
         }
     } catch (error) {
@@ -110,7 +110,7 @@ function setupInfiniteScroll() {
         });
     }, options);
 
-    ['photos', 'photobooth'].forEach(type => {
+    ['wedding', 'photobooth'].forEach(type => {
         const loadingTrigger = document.createElement('div');
         loadingTrigger.className = 'loading-trigger';
         loadingTrigger.id = `${type}-trigger`;
@@ -120,7 +120,7 @@ function setupInfiniteScroll() {
 }
 
 async function loadMorePhotos(type) {
-    const photos = type === 'photos' ? weddingPhotos : photoboothPhotos;
+    const photos = type === 'wedding' ? weddingPhotos : photoboothPhotos;
     const gallery = document.getElementById(type);
     const startIndex = currentPage[type] * PHOTOS_PER_PAGE;
     
