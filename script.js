@@ -128,64 +128,40 @@ async function loadMorePhotos(type) {
     
     isLoading = true;
     
-    const fragment = document.createDocumentFragment();
-    const endIndex = Math.min(startIndex + PHOTOS_PER_PAGE, photos.length);
-    
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i < Math.min(startIndex + PHOTOS_PER_PAGE, photos.length); i++) {
         const photo = photos[i];
+        
+        // Create container
         const item = document.createElement('div');
         item.className = 'gallery-item';
+        item.style.backgroundColor = 'red'; // Debug styling
         
-        // Create and append loading placeholder
-        const placeholder = document.createElement('div');
-        placeholder.className = 'photo-placeholder';
-        item.appendChild(placeholder);
-        
-        // Create image element
-        const img = new Image();
-        
-        // Set up handlers before setting src
-        img.onload = () => {
-            console.log('Thumbnail loaded successfully:', photo.thumb);
-            placeholder.remove();
-            item.appendChild(img);
-        };
-
-        img.onerror = (err) => {
-            console.error('Failed to load thumbnail:', photo.thumb, err);
-            placeholder.textContent = '!';
-        };
-
-        // Debug the actual URL being requested
-        fetch(photo.thumb)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                console.log('Thumbnail URL is valid:', photo.thumb);
-            })
-            .catch(err => console.error('Thumbnail URL check failed:', err));
-
+        // Create image element with explicit dimensions
+        const img = document.createElement('img');
+        img.src = photo.thumb;
         img.alt = photo.alt;
-        img.loading = 'lazy';
-        img.src = photo.thumb; // Set src last
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.position = 'absolute';
+        img.style.objectFit = 'cover';
+        img.style.backgroundColor = 'blue'; // Debug styling
         
+        console.log('Loading image:', photo.thumb);
+        
+        img.onload = () => {
+            console.log('Image loaded successfully:', photo.thumb);
+            item.style.backgroundColor = 'green'; // Visual confirmation of load
+        };
+        
+        img.onerror = (err) => {
+            console.error('Image failed to load:', photo.thumb, err);
+            item.style.backgroundColor = 'yellow'; // Visual error state
+        };
+        
+        item.appendChild(img);
         item.addEventListener('click', () => openPhotoSwipe(i, photos));
-        fragment.appendChild(item);
+        gallery.appendChild(item);
     }
-    
-    gallery.appendChild(fragment);
-    
-    // Handle loading trigger
-    const loadingTrigger = document.getElementById(`${type}-trigger`);
-    if (loadingTrigger) {
-        loadingTrigger.remove();
-    }
-    
-    const newTrigger = document.createElement('div');
-    newTrigger.className = 'loading-trigger';
-    newTrigger.id = `${type}-trigger`;
-    gallery.appendChild(newTrigger);
     
     currentPage[type]++;
     isLoading = false;
