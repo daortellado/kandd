@@ -59,15 +59,13 @@ async function getPhotosInDirectory(directory) {
         }
         
         const photos = data[directory].files.map(filename => {
-            // filename is already the base name (e.g., "collage_20241012102352")
             const photo = {
-                src: `./${directory}/full/${filename}.png`,            // e.g., ./photobooth/full/collage_20241012102352.png
-                thumb: `./${directory}/thumbs/${filename}_thumb.png`,   // e.g., ./photobooth/thumbs/collage_20241012102352_thumb.png
+                src: `./${directory}/full/${filename}.png`,
+                thumb: `./${directory}/thumbs/${filename}_thumb.png`,
                 width: directory === 'photos' ? 800 : 600,
                 height: directory === 'photos' ? 600 : 900,
                 alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
             };
-            
             console.log('Created photo object:', photo);
             return photo;
         });
@@ -121,7 +119,6 @@ function setupInfiniteScroll() {
     });
 }
 
-// Load more photos
 async function loadMorePhotos(type) {
     const photos = type === 'wedding' ? weddingPhotos : photoboothPhotos;
     const gallery = document.getElementById(type);
@@ -144,40 +141,47 @@ async function loadMorePhotos(type) {
         placeholder.className = 'photo-placeholder';
         item.appendChild(placeholder);
         
-        // Load image
+        // Create image element
         const img = new Image();
         
-        // Debug log the image path
-        console.log('Loading thumbnail:', photo.thumb);
-        
+        // Set up handlers before setting src
         img.onload = () => {
             console.log('Thumbnail loaded successfully:', photo.thumb);
-            placeholder.remove(); // Remove instead of just hiding
+            placeholder.remove();
             item.appendChild(img);
         };
 
-        img.onerror = (e) => {
-            console.error('Error loading thumbnail:', photo.thumb, e);
-            placeholder.textContent = 'Error loading image';
+        img.onerror = (err) => {
+            console.error('Failed to load thumbnail:', photo.thumb, err);
+            placeholder.textContent = '!';
         };
 
-        img.src = photo.thumb;
+        // Debug the actual URL being requested
+        fetch(photo.thumb)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                console.log('Thumbnail URL is valid:', photo.thumb);
+            })
+            .catch(err => console.error('Thumbnail URL check failed:', err));
+
         img.alt = photo.alt;
         img.loading = 'lazy';
+        img.src = photo.thumb; // Set src last
         
         item.addEventListener('click', () => openPhotoSwipe(i, photos));
         fragment.appendChild(item);
     }
     
-    // Remove loading trigger before adding new photos
+    gallery.appendChild(fragment);
+    
+    // Handle loading trigger
     const loadingTrigger = document.getElementById(`${type}-trigger`);
     if (loadingTrigger) {
         loadingTrigger.remove();
     }
     
-    gallery.appendChild(fragment);
-    
-    // Add back the loading trigger
     const newTrigger = document.createElement('div');
     newTrigger.className = 'loading-trigger';
     newTrigger.id = `${type}-trigger`;
