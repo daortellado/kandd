@@ -3,147 +3,31 @@
 /* Import the Playfair Display and Beth Ellen fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Beth+Ellen&display=swap');
 
-.tab-container {
-    height: 50vh;
-    width: 800px;
-    display: flex;
-    flex-direction: row;
-    max-width: 800px;
-    margin: 0 auto;
-    justify-content: space-between;
-  }
-  
-  .tabs {
-    flex: 0 0 20%;
-    min-width: 0; 
-    padding: 20px;
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-.tab {
-    padding: 10px 20px;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-size: 16px;
-    color: #333;
-    transition: background-color 0.3s, color 0.3s;
-    width: 100%; 
-    text-align: center;
-    min-width: 0;
-}
-
-.tab:hover, .tab.active {
-    background-color: #ff6600;
-    color: white;
-}
-
-.tab-content-wrapper {
-    flex: 0 0 80%; 
-    flex-basis: 80%;
-    padding: 20px;
-    overflow-y: auto;
-    height: 100%;
-    box-sizing: border-box;
-  }
-  
-  .tab-content {
-    display: none;
-    padding: 20px;
-    height: 100%;
-  }
-  
-  .tab-content.active {
-    display: block;
-  }  
-
-.faq-question {
-    cursor: pointer;
-    padding: 10px;
-    background-color: #f0f0f0;
-    margin-bottom: 5px;
-}
-
-.faq-answer {
-    display: none;
-    padding: 10px;
-    border-left: 2px solid #ff6600;
-    margin-bottom: 10px;
-    transition: height 0.3s ease-out; /* Add transition effect */
-}
-
-.faq-answer.show {
-    display: block;
-}
-
-.tab-content.show {
-    display: block;
-}
-
-.faq-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.details-selected {
-    /* styles here will only be applied when the "All the Details" section is selected on mobile devices */
-    position: fixed !important;
-    top: 20px !important; /* or any other styles you need */
-}
-
-.honeyfund-message {
-    margin-top: 20px;
-    color: white;
-    font-size: 18px;
-}
-
-.honeyfund-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: rgba(255, 102, 0, 0.8);
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.honeyfund-link:hover {
-    background-color: rgba(224, 85, 0, 0.8);
-}
-
-@media only screen and (max-width: 768px) {
-    .tabs {
-        flex-direction: column;
-    }
-
-    .tab {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 5px;
-    }
-}
-
+/* Global styles */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the body */
+    font-family: 'Playfair Display', serif;
 }
 
+/* View management */
+.view {
+    min-height: 100vh;
+}
+
+#galleryView {
+    background-color: #f5f5f5;
+}
+
+/* Splash page styles */
 .splash {
-    height: 100vh; /* Set height to cover the entire viewport */
-    background-image: url('splash-bg.jpg');
+    height: 100vh;
+    background-image: url('./assets/background.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
+    filter: grayscale(100%);
 }
 
 .overlay {
@@ -152,7 +36,7 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Add an overlay to make text more readable */
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .content {
@@ -162,323 +46,406 @@ body, html {
     transform: translate(-50%, -50%);
     text-align: center;
     color: white;
-    z-index: 1; /* Ensure content is above overlay */
+    z-index: 1;
+    width: 90%;
+    max-width: 600px;
 }
 
-/* Regular styling for top menu */
-.top-menu {
-    position: absolute;
-    top: 10px; /* Adjust the vertical position as needed */
-    left: 50%; /* Align menu to the center */
-    transform: translateX(-50%); /* Center menu horizontally */
-    z-index: 2; /* Ensure menu is above content and overlay */
-    width: max-content;
+/* Common elements */
+.logo {
+    width: 150px;
+    margin-bottom: 2rem;
 }
 
-/* Regular styling for top menu items */
-.top-menu ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+.title {
+    font-family: 'Beth Ellen', cursive;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
 }
 
-.top-menu ul li {
-    display: inline-block;
-    margin-right: 20px;
-}
-
-.top-menu ul li a {
+.button {
+    padding: 1rem 2rem;
+    background-color: rgba(255, 102, 0, 0.8);
     color: white;
     text-decoration: none;
-    font-size: 20px; /* Adjust the font size as needed */
-}
-
-.top-menu ul li a:hover {
-    color: #ff6600;
-}
-
-.section {
-    display: none;
-}
-
-.fixed-logo {
-    position: fixed;
-    top: 40px; /* Adjust the vertical position below the menu as needed */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2; /* Ensure logo is above content */
-    width: 150px; /* Adjust the width as needed */
-    height: auto;
-}
-
-/* Apply the Beth Ellen font to the "Save the Date" part */
-.save-the-date {
-    font-family: 'Beth Ellen', cursive; /* Apply the Beth Ellen font */
-    font-size: 24px; /* Adjust the font size as needed */
-    color: white;
-    margin-bottom: 10px; /* Adjust the margin as needed */
-}
-
-.event-details {
-    color: white;
-    font-size: 32px; /* Adjust the font size as needed */
-}
-
-/* Style the form */
-#email-form {
-    margin-top: 20px;
-    text-align: center; /* Center-align the form */
-}
-
-#email-form input[type="text"],
-#email-form input[type="email"] {
-    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the fields */
-    padding: 10px;
-    border: none;
     border-radius: 5px;
-    margin-bottom: 10px;
-    width: calc(100% - 42px); /* Adjust the width to be slightly less than 100% */
-    background-color: rgba(255, 255, 255, 0.2); /* Adjust the transparency as needed */
-    color: white;
-    text-align: center; /* Center-align text in input fields */
-}
-
-#email-form input[type="text"]::placeholder,
-#email-form input[type="email"]::placeholder {
-    color: rgba(255, 255, 255, 0.7); /* Adjust the transparency of placeholder text */
-    text-align: center; /* Center-align placeholder text */
-}
-
-#email-form button[type="submit"] {
-    font-family: 'Playfair Display', serif; /* Apply the Playfair Display font to the button */
-    padding: 10px 20px;
+    transition: background-color 0.3s ease;
     border: none;
-    border-radius: 5px;
-    background-color: rgba(255, 102, 0, 0.8); /* Adjust the transparency as needed */
-    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Add transition for smooth hover effect */
-    width: auto; /* Set width to auto */
 }
 
-#email-form button[type="submit"]:hover {
-    background-color: rgba(224, 85, 0, 0.8); /* Adjust the transparency for hover effect */
+.button:hover {
+    background-color: rgba(224, 85, 0, 0.8);
 }
 
-.plane {
-    max-width: 100px; /* Adjust the maximum width of the plane image */
-    height: auto;
-    margin-top: 20px; /* Adjust as needed */
-    display: block; /* Ensure the image is displayed as a block element */
-    margin-left: auto; /* Center-align the image horizontally */
-    margin-right: auto; /* Center-align the image horizontally */
-}
-
-.flyer {
-    max-width: 200px; /* Adjust the maximum width of the plane image */
-    height: auto;
-    margin-top: 20px; /* Adjust as needed */
-    display: block; /* Ensure the image is displayed as a block element */
-    margin-left: auto; /* Center-align the image horizontally */
-    margin-right: auto; /* Center-align the image horizontally */
-}
-
-.ring {
-    max-width: 400px; /* Adjust the maximum width of the plane image */
-    height: auto;
-    margin-top: 20px; /* Adjust as needed */
-    display: block; /* Ensure the image is displayed as a block element */
-    margin-left: auto; /* Center-align the image horizontally */
-    margin-right: auto; /* Center-align the image horizontally */
-}
-
-.carousel {
+.button-container {
     display: flex;
-    overflow-x: auto;
-    width: 50%; /* Adjust the width as needed */
-    margin: auto; /* Center the carousel */
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
-.carousel-img {
-    flex: 0 0 auto;
-    width: 100%;
-    margin-right: 10px; /* Add some space between images */
+/* Gallery header */
+.header {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.carousel-container {
+/* Gallery toggle */
+.gallery-toggle {
+    margin: 1.5rem 0;
+}
+
+.toggle-button {
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.5rem;
+    border: 2px solid rgba(255, 102, 0, 0.8);
+    background: none;
+    border-radius: 5px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-button.active {
+    background-color: rgba(255, 102, 0, 0.8);
+    color: white;
+}
+
+.toggle-button:hover {
+    background-color: rgba(255, 102, 0, 0.1);
+}
+
+.toggle-button.active:hover {
+    background-color: rgba(224, 85, 0, 0.8);
+}
+
+/* Gallery grid */
+.gallery-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.gallery {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.gallery.active {
+    display: grid;
+}
+
+#photobooth.gallery {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.gallery-item {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.prev, .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 3; /* Ensure arrows are above carousel */
+    padding-bottom: 100%;
     cursor: pointer;
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    color: white;
-    transition: color 0.3s ease;
+    background-color: #eee;
+    overflow: hidden;
 }
 
-.prev:hover, .next:hover {
-    color: #ff6600;
+#photobooth .gallery-item {
+    padding-bottom: 150%;
 }
 
-.prev {
-    left: 10px;
+.gallery-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
 }
 
-.next {
-    right: 10px;
+.gallery-item:hover img {
+    transform: scale(1.05);
 }
 
-/* Hide the hamburger menu button initially */
-.menu-toggle {
+/* Loading states */
+.photo-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.loading-trigger {
+    width: 100%;
+    height: 20px;
+    opacity: 0;
+}
+
+/* Modal styles */
+.modal {
     display: none;
-}
-
-.section {
-    position: relative; /* Add this */
-  }
-
-#logo-container {
-    display: block;
-}
-
-/* Media query for smaller screens (max-width: 768px) */
-@media only screen and (max-width: 768px) {
-
-    .top-menu ul.show ~ #logo-container {
-        display: block !important;
-    }
-
-    #logo-container {
-        display: block;
-    }
-
-    .tab-container {
-        flex-direction: column;
-        width: 100%;
-        height: auto;
-        margin: 0 auto;
-        padding: 0;
-        box-sizing: border-box;
-        position: fixed;
-        z-index: 1;
-      }
-      .tabs {
-        flex-direction: column;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      .tab {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 5px;
-        font-size: 14px; /* Reduce font size */
-        padding: 10px; /* Reduce padding */
-      }
-      .tab-content-wrapper {
-        width: 100%;
-        padding: 10px; /* Reduce padding */
-      }
-
-    .menu-toggle {
-        display: block; /* Display the hamburger menu button */
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: transparent;
-        border: none;
-        font-size: 24px;
-        color: white;
-        z-index: 2;
-    }
-
-    .menu-toggle:hover {
-        color: #ff6600;
-    }
-
-    .content {
-        width: 100vw;
-    }
-
-    .top-menu {
-        left: 0; /* Align menu to the left edge */
-        top: 0;
-        width: 100%; /* Set width to full width */
-        transform: none; /* Remove horizontal translation */
-        text-align: center; /* Center-align the menu items */
-    }
-
-    .top-menu ul {
-        display: none; /* Hide the regular menu on smaller screens */
-    }
-
-    .top-menu ul.show {
-        display: flex; /* Display the menu items as a flex container */
-        flex-direction: column; /* Stack the menu items vertically */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 1); /* Semi-transparent black with higher opacity */
-        z-index: 999; /* Ensure it's above all other elements */
-        padding: 20px; /* Add some padding */
-        box-sizing: border-box; /* Include padding in the width/height calculation */
-        justify-content: center; /* Center the menu items vertically */
-        align-items: center; /* Center the menu items horizontally */
-    }
-
-    .top-menu ul.show li {
-        margin-bottom: 20px; /* Add some spacing between menu items */
-        text-align: center;
-    }
-
-    .top-menu ul.show li a {
-        font-size: 24px; /* Increase the font size for better visibility */
-        color: white; /* Set the color of the menu items to white */
-        margin-left: 20px;
-    }
-
-    .fixed-logo {
-        left: 50vw; /* Adjust the left position as needed */
-    }
-
-    .tab-content {
-        height: 40vh; /* Set a fixed height or use vh units */
-        overflow-y: auto; /* Ensure overflow is set */
-      }
-}
-
-.loading-spinner {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+    font-family: 'Beth Ellen', cursive;
+    font-size: 1.8rem;
+    margin: 0 0 1.5rem 0;
+    color: #333;
+}
+
+.close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.5);
+    transition: color 0.3s ease;
+    width: 24px;
+    height: 24px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 9999; /* Ensure the spinner is on top of other elements */
-  }
-  
-  .spinner {
-    border: 4px solid #f3f3f3; /* Light gray */
-    border-top: 4px solid #3498db; /* Blue */
+    justify-content: center;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 2s linear infinite;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+}
+
+.close:hover {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.password-input {
+    width: calc(100% - 2rem);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.password-input:focus {
+    outline: none;
+    border-color: rgba(255, 102, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+}
+
+.modal .button {
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+/* Add subtle animation when modal appears */
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.modal-content {
+    animation: modalFade 0.3s ease-out;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 85%;
+        padding: 2rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Navigation */
+.back-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Vendor section */
+.vendor-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    z-index: 1;
+}
+
+.vendor-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+}
+
+.vendor-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.vendor-list.expanded {
+    max-height: 300px;
+    margin-top: 1rem;
+}
+
+.vendor-list li {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+    .button-container {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .button-container {
+        margin-bottom: 4rem;
+    }
+
+    .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .gallery-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 1rem;
+    }
+
+    .toggle-button {
+        margin: 0;
+    }
+
+    .logo {
+        width: 100px;
+    }
+
+    .modal-content {
+        width: 85%;
+        padding: 1.5rem;
+    }
+}
+
+/* High-DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .photo-placeholder {
+        background-size: 400% 100%;
+    }
+}
+
+/* Prevent text selection on interactive elements */
+.button,
+.toggle-button,
+.vendor-toggle,
+.close {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Improve accessibility */
+.gallery-item:focus-visible,
+.button:focus-visible,
+.toggle-button:focus-visible {
+    outline: 3px solid rgba(255, 102, 0, 0.5);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .gallery-container {
+        display: block;
+    }
+    
+    .back-button,
+    .vendor-section,
+    .gallery-toggle {
+        display: none;
+    }
+}

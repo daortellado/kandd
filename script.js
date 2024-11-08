@@ -1,160 +1,247 @@
-const menu = document.querySelector('.top-menu ul');
-const menuToggle = document.querySelector('.menu-toggle');
-const splashContent = document.getElementById('splash-content');
-const form = document.getElementById('email-form');
-const loadingSpinner = document.getElementById('loading-spinner');
-const logoContainer = document.getElementById('logo-container');
-const logo = document.querySelector('.fixed-logo');
+const PHOTOS_PER_PAGE = 20;
 
-// Set initial logo visibility on page load (show logo by default)
-document.addEventListener('DOMContentLoaded', function() {
-  logoContainer.style.display = 'block';
-});
+let weddingPhotos = [];
+let photoboothPhotos = [];
+let currentGalleryType = 'wedding';
+let currentPage = {
+    wedding: 0,
+    photobooth: 0
+};
+let isLoading = false;
 
-// Toggle menu function
-function toggleMenu() {
-  menu.classList.toggle('show');
-  logoContainer.style.display = menu.classList.contains('show') ? 'block' : 'none';
-}
-
-// Show section function
-function showSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  splashContent.innerHTML = section.innerHTML;
-  section.style.display = 'none';
-
-  if (window.innerWidth <= 768) {
-    if (sectionId === 'all-the-details') {
-      document.querySelector('.content').classList.add('details-selected');
-    } else {
-      document.querySelector('.content').classList.remove('details-selected');
-    }
-    // No need to explicitly hide the logo here, it's handled by toggleMenu
-  } else {
-    logoContainer.style.display = 'block';
-  }
-
-  if (sectionId === 'the-proposal') {
-    showSlides();
-  }
-}
-
-// Event listener for menu toggle button
-menuToggle.addEventListener('click', toggleMenu);
-
-// Event listener for logo click to reload the page
-logo.addEventListener('click', function() {
-    location.reload();
-});
-
-// Event delegation for menu item clicks
-menu.addEventListener('click', function(event) {
-    if (event.target.tagName === 'A') {
-        if (window.innerWidth <= 768) {
-            toggleMenu();
-        }
-    }
-});
-
-// Submit form event listener
-form.addEventListener('submit', function(event) {
-    event.preventDefault();
-    loadingSpinner.style.display = 'flex';
-
-    const formData = new FormData(form);
-    fetch(form.action, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        loadingSpinner.style.display = 'none';
-        if (data === 'success') {
-            alert('Thank you! Your submission has been received.');
-            form.reset();
-        } else {
-            alert('Oops! Something went wrong. Please try again later.');
-        }
-    })
-    .catch(error => {
-        loadingSpinner.style.display = 'none';
-        console.error('Error:', error);
-        alert('Oops! Something went wrong. Please try again later.');
+// View management
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(view => {
+        view.style.display = 'none';
     });
-});
-
-// Carousel logic
-let slideIndex = 1;
-let totalSlides;
-
-function nextSlide() {
-    slideIndex++;
-    if (slideIndex > totalSlides) slideIndex = 1;
-    showSlides();
+    document.getElementById(viewId).style.display = 'block';
 }
 
-function prevSlide() {
-    slideIndex--;
-    if (slideIndex < 1) slideIndex = totalSlides;
-    showSlides();
+function returnToSplash() {
+    showView('splashView');
 }
 
-function showSlides() {
-    const slides = document.querySelectorAll('.carousel-img');
-    slides.forEach((slide, index) => {
-        slide.style.display = (index === slideIndex - 1) ? 'block' : 'none';
-    });
+// Modal management
+function showGalleryModal() {
+    document.getElementById('galleryModal').style.display = 'block';
 }
 
-function showTab(tabId, event) {
-    // Hide all tab contents
-    var tabContents = document.getElementsByClassName('tab-content');
-    for (var i = 0; i < tabContents.length; i++) {
-        tabContents[i].style.display = 'none';
-    }
+function closeModal() {
+    document.getElementById('galleryModal').style.display = 'none';
+    document.getElementById('galleryPassword').value = '';
+}
 
-    // Remove active class from all tabs
-    var tabs = document.getElementsByClassName('tab');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].classList.remove('active');
-    }
+// Password handling
+const GALLERY_KEY = 'bGlnaHRob3VzZQ==';
 
-    // Show the selected tab content
-    document.getElementById(tabId).style.display = 'block';
-
-    // Add active class to the selected tab
-    if (event) {
-        event.target.classList.add('active');
-    } else {
-        const tabLink = document.querySelector(`[href="#${tabId}"]`);
-        if (tabLink) {
-            tabLink.classList.add('active');
+function checkPassword() {
+    const password = document.getElementById('galleryPassword').value;
+    if (atob(GALLERY_KEY) === password.toLowerCase()) {
+        closeModal();
+        showView('galleryView');
+        if (!document.querySelector('.gallery-item')) {
+            initGalleries();
         }
+    } else {
+        alert('Incorrect password. Please try again.');
     }
+}
 
-    // Event delegation for FAQ questions (moved inside showTab)
-    const faq = document.getElementById('faq');
-    if (faq) {
-        faq.addEventListener('click', function(event) {
-            if (event.target.classList.contains('faq-question')) {
-                toggleFaqAnswer(event);
+async function getPhotosInDirectory(directory) {
+    try {
+        const response = await fetch(`./${directory}/thumbs/`);  // Changed to relative path
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const files = await response.text();
+        
+        // Different patterns for wedding photos vs photobooth
+        const pattern = directory === 'photos' 
+            ? /2024_10_12_KatelynDamianWedding-\d+_thumb\.jpg/g
+            : /collage_[0-9]+_thumb\.jpg/g;
+        
+        const thumbFiles = files.match(pattern) || [];
+        
+        // Sort files based on the numerical portion
+        const sortedFiles = thumbFiles.sort((a, b) => {
+            const getNumber = (filename) => {
+                if (directory === 'photos') {
+                    return parseInt(filename.match(/Wedding-(\d+)/)[1]);
+                } else {
+                    return parseInt(filename.match(/collage_(\d+)/)[1]);
+                }
+            };
+            return getNumber(a) - getNumber(b);
+        });
+
+        return sortedFiles.map(thumb => {
+            const fullImage = thumb.replace('_thumb', '');
+            return {
+                src: `./${directory}/full/${fullImage}`,     // Changed to relative path
+                thumb: `./${directory}/thumbs/${thumb}`,      // Changed to relative path
+                width: directory === 'photos' ? 800 : 600,
+                height: directory === 'photos' ? 600 : 900,
+                alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
+            };
+        });
+    } catch (error) {
+        console.error(`Error loading ${directory}:`, error);
+        return [];
+    }
+}
+
+// Gallery initialization
+async function initGalleries() {
+    // Load and sort photo lists first
+    weddingPhotos = await getPhotosInDirectory('photos');
+    photoboothPhotos = await getPhotosInDirectory('photobooth');
+    
+    console.log(`Loaded ${weddingPhotos.length} wedding photos and ${photoboothPhotos.length} photobooth photos`);
+    
+    // Then set up infinite scroll and load initial photos
+    setupInfiniteScroll();
+    loadMorePhotos('wedding');
+    loadMorePhotos('photobooth');
+}
+
+// Infinite scroll setup
+function setupInfiniteScroll() {
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading) {
+                loadMorePhotos(currentGalleryType);
             }
         });
-    }
-}
+    }, options);
 
-function toggleFaqAnswer(event) {
-    var answer = event.target.nextElementSibling;
-
-    // Close all other answers
-    var allAnswers = document.querySelectorAll('.faq-answer');
-    allAnswers.forEach(function(answer) {
-        answer.classList.remove('show');
+    // Observe loading trigger elements
+    ['wedding', 'photobooth'].forEach(type => {
+        const loadingTrigger = document.createElement('div');
+        loadingTrigger.className = 'loading-trigger';
+        loadingTrigger.id = `${type}-trigger`;
+        document.getElementById(type).appendChild(loadingTrigger);
+        observer.observe(loadingTrigger);
     });
-
-    // Toggle the current answer
-    answer.classList.toggle('show');
 }
 
-// Show the default tab on page load
-showTab('schedule'); // Pass the default tab ID
+// Load more photos
+async function loadMorePhotos(type) {
+    const photos = type === 'wedding' ? weddingPhotos : photoboothPhotos;
+    const gallery = document.getElementById(type);
+    const startIndex = currentPage[type] * PHOTOS_PER_PAGE;
+    
+    if (startIndex >= photos.length || isLoading) return;
+    
+    isLoading = true;
+    
+    const fragment = document.createDocumentFragment();
+    const endIndex = Math.min(startIndex + PHOTOS_PER_PAGE, photos.length);
+    
+    for (let i = startIndex; i < endIndex; i++) {
+        const photo = photos[i];
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        
+        // Create and append loading placeholder
+        const placeholder = document.createElement('div');
+        placeholder.className = 'photo-placeholder';
+        item.appendChild(placeholder);
+        
+        // Load image
+        const img = new Image();
+        img.src = photo.thumb;
+        img.alt = photo.alt;
+        img.loading = 'lazy';
+        
+        img.onload = () => {
+            placeholder.style.display = 'none';
+            item.appendChild(img);
+        };
+        
+        item.addEventListener('click', () => openPhotoSwipe(i, photos));
+        fragment.appendChild(item);
+    }
+    
+    // Remove loading trigger before adding new photos
+    const loadingTrigger = document.getElementById(`${type}-trigger`);
+    if (loadingTrigger) {
+        loadingTrigger.remove();
+    }
+    
+    gallery.appendChild(fragment);
+    
+    // Add back the loading trigger
+    const newTrigger = document.createElement('div');
+    newTrigger.className = 'loading-trigger';
+    newTrigger.id = `${type}-trigger`;
+    gallery.appendChild(newTrigger);
+    
+    currentPage[type]++;
+    isLoading = false;
+}
+
+// Gallery switching
+function switchGallery(type) {
+    currentGalleryType = type;
+    
+    // Update toggle buttons
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update galleries
+    document.querySelectorAll('.gallery').forEach(gallery => {
+        gallery.classList.remove('active');
+    });
+    document.getElementById(type).classList.add('active');
+}
+
+// PhotoSwipe initialization
+function openPhotoSwipe(index, photos) {
+    const pswpElement = document.createElement('div');
+    pswpElement.className = 'pswp';
+    document.body.appendChild(pswpElement);
+
+    const options = {
+        dataSource: photos,
+        index: index,
+        closeOnVerticalDrag: true,
+        clickToCloseNonZoomable: true
+    };
+
+    const lightbox = new PhotoSwipe(options);
+    lightbox.init();
+    
+    lightbox.on('destroy', () => {
+        pswpElement.remove();
+    });
+}
+
+// Vendor section toggle
+function toggleVendors() {
+    const vendorList = document.getElementById('vendorList');
+    const toggle = document.querySelector('.vendor-toggle');
+    vendorList.classList.toggle('expanded');
+    toggle.textContent = vendorList.classList.contains('expanded') 
+        ? 'Special Shoutout to Our Vendors ▲'
+        : 'Special Shoutout to Our Vendors ▼';
+}
+
+// Event listeners
+document.getElementById('galleryPassword').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        checkPassword();
+    }
+});
+
+window.onclick = function(event) {
+    const modal = document.getElementById('galleryModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+};
