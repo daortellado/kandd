@@ -1,13 +1,17 @@
-// Calculate photos per page based on viewport
 function calculatePhotosPerPage() {
-    const galleryWidth = document.querySelector('.gallery-container').offsetWidth;
-    const minPhotoWidth = window.innerWidth <= 768 ? 150 : 250; // Matches our CSS breakpoints
-    const columnsPerRow = Math.floor(galleryWidth / minPhotoWidth);
-    // Return enough photos to fill 2 complete rows
-    return columnsPerRow * 2;
+    // Get actual gallery width
+    const gallery = document.querySelector('.gallery.active');
+    if (!gallery) return 12; // fallback default
+
+    const galleryWidth = gallery.offsetWidth;
+    const minPhotoWidth = window.innerWidth <= 768 ? 150 : 250;
+    const columnsPerRow = Math.max(1, Math.floor(galleryWidth / minPhotoWidth));
+    console.log(`Gallery width: ${galleryWidth}, columns per row: ${columnsPerRow}`);
+    // Return enough photos to fill 3 complete rows
+    return columnsPerRow * 3;
 }
 
-let PHOTOS_PER_PAGE;
+let PHOTOS_PER_PAGE = 12; // Default value
 let weddingPhotos = [];
 let photoboothPhotos = [];
 let currentGalleryType = 'wedding';
@@ -24,10 +28,12 @@ function showView(viewId) {
     });
     document.getElementById(viewId).style.display = 'block';
     
-    // Calculate photos per page when showing gallery
     if (viewId === 'galleryView') {
-        PHOTOS_PER_PAGE = calculatePhotosPerPage();
-        console.log(`Set to load ${PHOTOS_PER_PAGE} photos per page`);
+        // Wait for layout to settle
+        setTimeout(() => {
+            PHOTOS_PER_PAGE = calculatePhotosPerPage();
+            console.log(`Set to load ${PHOTOS_PER_PAGE} photos per page`);
+        }, 100);
     }
 }
 
@@ -84,8 +90,9 @@ async function getPhotosInDirectory(directory) {
             const photo = {
                 src: `${actualDir}/full/${filename}.${fileExt}`,
                 thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
-                width: directory === 'wedding' ? 800 : 600,
-                height: directory === 'wedding' ? 600 : 900,
+                // Updated dimensions for wedding photos
+                width: directory === 'wedding' ? 1500 : 600,
+                height: directory === 'wedding' ? 1000 : 900,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
             return photo;
@@ -167,10 +174,7 @@ async function loadMorePhotos(type) {
         const img = document.createElement('img');
         img.src = photo.thumb;
         img.alt = photo.alt;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.position = 'absolute';
-        img.style.objectFit = 'cover';
+        img.loading = 'lazy';
         
         img.onload = () => {
             console.log(`Loaded image ${i + 1} of batch`);
@@ -198,6 +202,7 @@ async function loadMorePhotos(type) {
 
 function switchGallery(type) {
     currentGalleryType = type;
+    currentPage[type] = 0; // Reset page count for the selected gallery
     
     // Update toggle buttons
     document.querySelectorAll('.toggle-button').forEach(button => {
@@ -208,11 +213,20 @@ function switchGallery(type) {
     // Update galleries
     document.querySelectorAll('.gallery').forEach(gallery => {
         gallery.classList.remove('active');
+        gallery.innerHTML = ''; // Clear existing photos
     });
-    document.getElementById(type).classList.add('active');
+    
+    const selectedGallery = document.getElementById(type);
+    selectedGallery.classList.add('active');
+    
+    // Recalculate photos per page for new gallery
+    PHOTOS_PER_PAGE = calculatePhotosPerPage();
+    
+    // Setup infinite scroll and load initial photos
+    setupInfiniteScroll();
+    loadMorePhotos(type);
 }
 
-// PhotoSwipe initialization
 function openPhotoSwipe(index, photos) {
     const pswpElement = document.createElement('div');
     pswpElement.className = 'pswp';
@@ -223,10 +237,17 @@ function openPhotoSwipe(index, photos) {
         index: index,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
-        pswpModule: window.PhotoSwipe
+        pswpModule: window.PhotoSwipe,
+        padding: { top: 20, bottom: 20, left: 20, right: 20 },
+        imageClickAction: 'zoom',
+        tapAction: 'zoom',
+        preloaderDelay: 0
     };
 
     const lightbox = new window.PhotoSwipe(options);
+    lightbox.on('beforeOpen', () => {
+        lightbox.options.initialZoomLevel = 'fit';
+    });
     lightbox.init();
     
     lightbox.on('destroy', () => {
@@ -234,7 +255,6 @@ function openPhotoSwipe(index, photos) {
     });
 }
 
-// Vendor section toggle
 function toggleVendors() {
     const vendorList = document.getElementById('vendorList');
     const toggle = document.querySelector('.vendor-toggle');

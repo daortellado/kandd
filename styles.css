@@ -23,7 +23,7 @@ body, html {
 /* Splash page styles */
 .splash {
     height: 100vh;
-    background-image: url('./assets/background.jpg');
+    background-image: url('/assets/background.jpg');
     background-size: cover;
     background-position: center;
     position: relative;
@@ -55,6 +55,13 @@ body, html {
 .logo {
     width: 150px;
     margin-bottom: 2rem;
+    /* Add filter for splash page (white) */
+    filter: brightness(0) invert(1);
+}
+
+/* Logo in gallery view should be black */
+#galleryView .logo {
+    filter: none; /* Reset to original black */
 }
 
 .title {
@@ -153,10 +160,15 @@ body, html {
     cursor: pointer;
     background-color: #eee;
     overflow: hidden;
+    transition: transform 0.3s ease;
 }
 
 #photobooth .gallery-item {
     padding-bottom: 150%;
+}
+
+.gallery-item:hover {
+    transform: scale(1.02);
 }
 
 .gallery-item img {
@@ -166,38 +178,29 @@ body, html {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
 }
 
-.gallery-item:hover img {
-    transform: scale(1.05);
-}
-
-/* Loading states */
-.photo-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
+/* Loading indicator */
 .loading-trigger {
-    width: 100%;
-    height: 20px;
-    opacity: 0;
+    height: 40px;
+    margin: 20px 0;
+    text-align: center;
+    background: rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-trigger::after {
+    content: '...';
+    animation: dots 1s infinite;
+    font-size: 24px;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
 }
 
 /* Modal styles */
@@ -210,7 +213,6 @@ body, html {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 2;
-    backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -218,112 +220,26 @@ body, html {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 2.5rem;
-    border-radius: 10px;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 5px;
     width: 90%;
     max-width: 400px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-content h2 {
-    font-family: 'Beth Ellen', cursive;
-    font-size: 1.8rem;
-    margin: 0 0 1.5rem 0;
-    color: #333;
 }
 
 .close {
     position: absolute;
     right: 1rem;
-    top: 1rem;
+    top: 0.5rem;
     font-size: 1.5rem;
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.5);
-    transition: color 0.3s ease;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.close:hover {
-    color: rgba(0, 0, 0, 0.8);
 }
 
 .password-input {
-    width: calc(100% - 2rem);
-    padding: 0.8rem 1rem;
+    width: 100%;
+    padding: 0.5rem;
     margin: 1rem 0;
     font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    text-align: center;
-    transition: border-color 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.password-input:focus {
-    outline: none;
-    border-color: rgba(255, 102, 0, 0.5);
-    box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
-}
-
-.modal .button {
-    margin-top: 0.5rem;
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
-}
-
-/* Add subtle animation when modal appears */
-@keyframes modalFade {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -48%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-}
-
-.modal-content {
-    animation: modalFade 0.3s ease-out;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .modal-content {
-        width: 85%;
-        padding: 2rem;
-    }
-
-    .modal-content h2 {
-        font-size: 1.5rem;
-    }
-}
-
-/* Navigation */
-.back-button {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    z-index: 1000;
-    transition: background-color 0.3s ease;
-}
-
-.back-button:hover {
-    background-color: rgba(0, 0, 0, 0.9);
 }
 
 /* Vendor section */
@@ -370,23 +286,33 @@ body, html {
     font-size: 0.9rem;
 }
 
-.loading-trigger {
-    height: 20px;
-    margin: 20px 0;
-    text-align: center;
-    clear: both;
+/* Back button */
+.back-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
 }
 
-.loading-trigger::after {
-    content: 'Loading more photos...';
-    color: #666;
+.back-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Responsive design */
+/* Media queries */
 @media (min-width: 768px) {
     .button-container {
         flex-direction: row;
         justify-content: center;
+    }
+
+    .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 }
 
@@ -424,41 +350,3 @@ body, html {
         padding: 1.5rem;
     }
 }
-
-/* High-DPI screens */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .photo-placeholder {
-        background-size: 400% 100%;
-    }
-}
-
-/* Prevent text selection on interactive elements */
-.button,
-.toggle-button,
-.vendor-toggle,
-.close {
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-/* Improve accessibility */
-.gallery-item:focus-visible,
-.button:focus-visible,
-.toggle-button:focus-visible {
-    outline: 3px solid rgba(255, 102, 0, 0.5);
-    outline-offset: 2px;
-}
-
-/* Print styles */
-@media print {
-    .gallery-container {
-        display: block;
-    }
-    
-    .back-button,
-    .vendor-section,
-    .gallery-toggle {
-        display: none;
-    }
-}
-
