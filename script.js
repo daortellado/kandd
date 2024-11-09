@@ -53,18 +53,25 @@ async function getPhotosInDirectory(directory) {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
+        // Map the JSON keys to actual directory names
+        const dirMap = {
+            'wedding': 'photos',    // JSON key -> actual directory
+            'photobooth': 'photobooth'
+        };
+
         if (!data || !data[directory] || !data[directory].files) {
             console.log('Data structure:', data);
             return [];
         }
         
         const photos = data[directory].files.map(filename => {
+            const actualDir = dirMap[directory];
             const photo = {
-                src: `./${directory}/full/${filename}.png`,
-                thumb: `./${directory}/thumbs/${filename}_thumb.png`,
-                width: directory === 'photos' ? 800 : 600,
-                height: directory === 'photos' ? 600 : 900,
-                alt: directory === 'photos' ? 'Wedding Photo' : 'Photobooth Strip'
+                src: `./${actualDir}/full/${filename}.png`,
+                thumb: `./${actualDir}/thumbs/${filename}_thumb.png`,
+                width: directory === 'wedding' ? 800 : 600,
+                height: directory === 'wedding' ? 600 : 900,
+                alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
             console.log('Created photo object:', photo);
             return photo;
