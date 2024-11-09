@@ -127,26 +127,30 @@ async function initGalleries() {
 function setupInfiniteScroll() {
     const options = {
         root: null,
-        rootMargin: '100px', // Start loading before reaching the end
+        rootMargin: '100px',
         threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isLoading) {
-                console.log('Intersection observed, loading more photos');
                 loadMorePhotos(currentGalleryType);
             }
         });
     }, options);
 
     ['wedding', 'photobooth'].forEach(type => {
+        // Create a wrapper for the loading trigger
+        const wrapper = document.createElement('div');
+        wrapper.className = 'loading-trigger-wrapper';
+        
         const loadingTrigger = document.createElement('div');
         loadingTrigger.className = 'loading-trigger';
         loadingTrigger.id = `${type}-trigger`;
-        document.getElementById(type).appendChild(loadingTrigger);
+        
+        wrapper.appendChild(loadingTrigger);
+        document.getElementById(type).appendChild(wrapper);
         observer.observe(loadingTrigger);
-        console.log(`Set up infinite scroll trigger for ${type}`);
     });
 }
 
@@ -155,19 +159,21 @@ async function loadMorePhotos(type) {
     const gallery = document.getElementById(type);
     const startIndex = currentPage[type] * PHOTOS_PER_PAGE;
     
-    if (startIndex >= photos.length || isLoading) {
-        console.log(`All photos loaded for ${type} gallery or loading in progress`);
-        return;
-    }
+    if (startIndex >= photos.length || isLoading) return;
     
-    console.log(`Loading ${PHOTOS_PER_PAGE} more ${type} photos starting from index ${startIndex}`);
     isLoading = true;
     
+    // Remove old loading trigger
+    const oldTriggerWrapper = gallery.querySelector('.loading-trigger-wrapper');
+    if (oldTriggerWrapper) {
+        oldTriggerWrapper.remove();
+    }
+
     const endIndex = Math.min(startIndex + PHOTOS_PER_PAGE, photos.length);
     
+    // Add photos
     for (let i = startIndex; i < endIndex; i++) {
         const photo = photos[i];
-        
         const item = document.createElement('div');
         item.className = 'gallery-item';
         
@@ -176,28 +182,26 @@ async function loadMorePhotos(type) {
         img.alt = photo.alt;
         img.loading = 'lazy';
         
-        img.onload = () => {
-            console.log(`Loaded image ${i + 1} of batch`);
-        };
-        
-        img.onerror = (err) => {
-            console.error(`Failed to load image ${i + 1}:`, photo.thumb);
-        };
-        
         item.appendChild(img);
         item.addEventListener('click', () => openPhotoSwipe(i, photos));
         gallery.appendChild(item);
     }
     
+    // Add new loading trigger at the end if there are more photos
+    if (endIndex < photos.length) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'loading-trigger-wrapper';
+        
+        const loadingTrigger = document.createElement('div');
+        loadingTrigger.className = 'loading-trigger';
+        loadingTrigger.id = `${type}-trigger`;
+        
+        wrapper.appendChild(loadingTrigger);
+        gallery.appendChild(wrapper);
+    }
+    
     currentPage[type]++;
     isLoading = false;
-
-    // Check if we need to keep observing
-    if (endIndex >= photos.length) {
-        console.log(`Removing infinite scroll for ${type} - all photos loaded`);
-        const trigger = document.getElementById(`${type}-trigger`);
-        if (trigger) trigger.remove();
-    }
 }
 
 function switchGallery(type) {

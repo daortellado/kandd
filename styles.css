@@ -55,13 +55,11 @@ body, html {
 .logo {
     width: 150px;
     margin-bottom: 2rem;
-    /* Add filter for splash page (white) */
-    filter: brightness(0) invert(1);
 }
 
-/* Logo in gallery view should be black */
-#galleryView .logo {
-    filter: none; /* Reset to original black */
+/* Make logo white only on splash page */
+#splashView .logo {
+    filter: brightness(0) invert(1);
 }
 
 .title {
@@ -181,14 +179,20 @@ body, html {
 }
 
 /* Loading indicator */
-.loading-trigger {
+.loading-trigger-wrapper {
+    grid-column: 1 / -1;  /* Span all columns */
     height: 40px;
     margin: 20px 0;
+}
+
+.loading-trigger {
+    height: 100%;
     text-align: center;
     background: rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 5px;
 }
 
 .loading-trigger::after {
@@ -201,6 +205,14 @@ body, html {
     0%, 20% { content: '.'; }
     40% { content: '..'; }
     60%, 100% { content: '...'; }
+}
+
+/* Make sure gallery grid can handle the full-width loading trigger */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
 }
 
 /* Modal styles */
