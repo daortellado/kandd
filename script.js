@@ -1,5 +1,13 @@
-const PHOTOS_PER_PAGE = 20;
+// Calculate photos per page based on viewport
+function calculatePhotosPerPage() {
+    const galleryWidth = document.querySelector('.gallery-container').offsetWidth;
+    const minPhotoWidth = window.innerWidth <= 768 ? 150 : 250; // Matches our CSS breakpoints
+    const columnsPerRow = Math.floor(galleryWidth / minPhotoWidth);
+    // Return enough photos to fill 2 complete rows
+    return columnsPerRow * 2;
+}
 
+let PHOTOS_PER_PAGE;
 let weddingPhotos = [];
 let photoboothPhotos = [];
 let currentGalleryType = 'wedding';
@@ -15,6 +23,12 @@ function showView(viewId) {
         view.style.display = 'none';
     });
     document.getElementById(viewId).style.display = 'block';
+    
+    // Calculate photos per page when showing gallery
+    if (viewId === 'galleryView') {
+        PHOTOS_PER_PAGE = calculatePhotosPerPage();
+        console.log(`Set to load ${PHOTOS_PER_PAGE} photos per page`);
+    }
 }
 
 function returnToSplash() {
@@ -65,7 +79,7 @@ async function getPhotosInDirectory(directory) {
         
         const photos = data[directory].files.map(filename => {
             const actualDir = dirMap[directory];
-            const fileExt = directory === 'wedding' ? 'jpg' : 'png';  // Use jpg for wedding, png for photobooth
+            const fileExt = directory === 'wedding' ? 'jpg' : 'png';
             
             const photo = {
                 src: `${actualDir}/full/${filename}.${fileExt}`,
@@ -74,7 +88,6 @@ async function getPhotosInDirectory(directory) {
                 height: directory === 'wedding' ? 600 : 900,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
-            console.log('Created photo object:', photo);
             return photo;
         });
         
@@ -87,10 +100,12 @@ async function getPhotosInDirectory(directory) {
 
 async function initGalleries() {
     try {
+        PHOTOS_PER_PAGE = calculatePhotosPerPage();
         weddingPhotos = await getPhotosInDirectory('wedding');
         photoboothPhotos = await getPhotosInDirectory('photobooth');
         
         console.log(`Loaded ${weddingPhotos.length} wedding photos and ${photoboothPhotos.length} photobooth photos`);
+        console.log(`Will load ${PHOTOS_PER_PAGE} photos per page`);
         
         if (weddingPhotos.length > 0 || photoboothPhotos.length > 0) {
             setupInfiniteScroll();
@@ -102,17 +117,17 @@ async function initGalleries() {
     }
 }
 
-// Infinite scroll setup
 function setupInfiniteScroll() {
     const options = {
         root: null,
-        rootMargin: '0px',
+        rootMargin: '100px', // Start loading before reaching the end
         threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isLoading) {
+                console.log('Intersection observed, loading more photos');
                 loadMorePhotos(currentGalleryType);
             }
         });
@@ -124,6 +139,7 @@ function setupInfiniteScroll() {
         loadingTrigger.id = `${type}-trigger`;
         document.getElementById(type).appendChild(loadingTrigger);
         observer.observe(loadingTrigger);
+        console.log(`Set up infinite scroll trigger for ${type}`);
     });
 }
 
@@ -132,19 +148,22 @@ async function loadMorePhotos(type) {
     const gallery = document.getElementById(type);
     const startIndex = currentPage[type] * PHOTOS_PER_PAGE;
     
-    if (startIndex >= photos.length || isLoading) return;
+    if (startIndex >= photos.length || isLoading) {
+        console.log(`All photos loaded for ${type} gallery or loading in progress`);
+        return;
+    }
     
+    console.log(`Loading ${PHOTOS_PER_PAGE} more ${type} photos starting from index ${startIndex}`);
     isLoading = true;
     
-    for (let i = startIndex; i < Math.min(startIndex + PHOTOS_PER_PAGE, photos.length); i++) {
+    const endIndex = Math.min(startIndex + PHOTOS_PER_PAGE, photos.length);
+    
+    for (let i = startIndex; i < endIndex; i++) {
         const photo = photos[i];
         
-        // Create container
         const item = document.createElement('div');
         item.className = 'gallery-item';
-        item.style.backgroundColor = 'red'; // Debug styling
         
-        // Create image element with explicit dimensions
         const img = document.createElement('img');
         img.src = photo.thumb;
         img.alt = photo.alt;
@@ -152,18 +171,13 @@ async function loadMorePhotos(type) {
         img.style.height = '100%';
         img.style.position = 'absolute';
         img.style.objectFit = 'cover';
-        img.style.backgroundColor = 'blue'; // Debug styling
-        
-        console.log('Loading image:', photo.thumb);
         
         img.onload = () => {
-            console.log('Image loaded successfully:', photo.thumb);
-            item.style.backgroundColor = 'green'; // Visual confirmation of load
+            console.log(`Loaded image ${i + 1} of batch`);
         };
         
         img.onerror = (err) => {
-            console.error('Image failed to load:', photo.thumb, err);
-            item.style.backgroundColor = 'yellow'; // Visual error state
+            console.error(`Failed to load image ${i + 1}:`, photo.thumb);
         };
         
         item.appendChild(img);
@@ -173,9 +187,15 @@ async function loadMorePhotos(type) {
     
     currentPage[type]++;
     isLoading = false;
+
+    // Check if we need to keep observing
+    if (endIndex >= photos.length) {
+        console.log(`Removing infinite scroll for ${type} - all photos loaded`);
+        const trigger = document.getElementById(`${type}-trigger`);
+        if (trigger) trigger.remove();
+    }
 }
 
-// Gallery switching
 function switchGallery(type) {
     currentGalleryType = type;
     
@@ -237,3 +257,8 @@ window.onclick = function(event) {
         closeModal();
     }
 };
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    PHOTOS_PER_PAGE = calculatePhotosPerPage();
+});

@@ -370,6 +370,18 @@ body, html {
     font-size: 0.9rem;
 }
 
+.loading-trigger {
+    height: 20px;
+    margin: 20px 0;
+    text-align: center;
+    clear: both;
+}
+
+.loading-trigger::after {
+    content: 'Loading more photos...';
+    color: #666;
+}
+
 /* Responsive design */
 @media (min-width: 768px) {
     .button-container {
@@ -449,3 +461,4 @@ body, html {
         display: none;
     }
 }
+
