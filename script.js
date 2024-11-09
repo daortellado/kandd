@@ -118,27 +118,28 @@ async function initGalleries() {
 function setupInfiniteScroll() {
     const options = {
         root: null,
-        rootMargin: '100px',
-        threshold: 0.1
+        rootMargin: '200px', // Increased margin to trigger earlier
+        threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isLoading) {
+                console.log('Loading more photos...'); // Debug log
                 loadMorePhotos(currentGalleryType);
             }
         });
     }, options);
 
-    // Create and observe trigger for active gallery
+    // Create trigger element outside the grid structure
+    const galleryContainer = document.querySelector('.gallery-container');
     const loadingTrigger = document.createElement('div');
     loadingTrigger.className = 'loading-trigger-wrapper';
     const trigger = document.createElement('div');
     trigger.className = 'loading-trigger';
     loadingTrigger.appendChild(trigger);
+    galleryContainer.appendChild(loadingTrigger);
     
-    const gallery = document.getElementById(currentGalleryType);
-    gallery.appendChild(loadingTrigger);
     observer.observe(trigger);
 }
 
