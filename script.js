@@ -53,9 +53,8 @@ async function getPhotosInDirectory(directory) {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
-        // Map the JSON keys to actual directory names
         const dirMap = {
-            'wedding': 'photos',    // JSON key -> actual directory
+            'wedding': 'photos',
             'photobooth': 'photobooth'
         };
 
@@ -66,9 +65,11 @@ async function getPhotosInDirectory(directory) {
         
         const photos = data[directory].files.map(filename => {
             const actualDir = dirMap[directory];
+            const fileExt = directory === 'wedding' ? 'jpg' : 'png';  // Use jpg for wedding, png for photobooth
+            
             const photo = {
-                src: `./${actualDir}/full/${filename}.png`,
-                thumb: `./${actualDir}/thumbs/${filename}_thumb.png`,
+                src: `${actualDir}/full/${filename}.${fileExt}`,
+                thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
                 width: directory === 'wedding' ? 800 : 600,
                 height: directory === 'wedding' ? 600 : 900,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
