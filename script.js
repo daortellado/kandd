@@ -209,52 +209,101 @@ async function openPhotoSwipe(index, photos) {
     loader.textContent = 'Loading...';
     document.body.appendChild(loader);
 
-    let currentIndex = index;
-    
-    // Get dimensions for initial set of images (current, prev, next)
-    const initialPhotos = [];
-    for (let i = Math.max(0, index - 1); i <= Math.min(photos.length - 1, index + 1); i++) {
-        const dimensions = await getImageDimensions(photos[i].src);
-        initialPhotos.push({
-            ...photos[i],
-            w: dimensions.width,
-            h: dimensions.height
-        });
-    }
+    // Get dimensions for current image
+    const dimensions = await getImageDimensions(photos[index].src);
+    const photoWithDimensions = { ...photos[index], ...dimensions };
 
     // Remove loader
     document.body.removeChild(loader);
 
     const options = {
-        dataSource: photos,  // Use full array of photos
-        index: index,        // Start at clicked photo
+        dataSource: [photoWithDimensions], // Keep single photo for correct aspect ratio
+        index: 0,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
         pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
         imageClickAction: 'zoom',
         tapAction: 'zoom',
-        preloaderDelay: 0,
-        arrowPrev: true,
-        arrowNext: true,
-        arrowKeys: true,
-        getViewportSizeFn: (options, pswp) => {
-            return {
-                x: window.innerWidth,
-                y: window.innerHeight
-            };
-        }
+        preloaderDelay: 0
     };
 
     const lightbox = new window.PhotoSwipe(options);
+    
+    // Add our own navigation buttons after PhotoSwipe is initialized
+    lightbox.on('firstUpdate', () => {
+        let currentIndex = index;
 
-    lightbox.on('change', async () => {
-        const newIndex = lightbox.getCurrentIndex();
-        if (!photos[newIndex].w || !photos[newIndex].h) {
-            const dimensions = await getImageDimensions(photos[newIndex].src);
-            photos[newIndex].w = dimensions.width;
-            photos[newIndex].h = dimensions.height;
-        }
+        // Create and style navigation buttons
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = '❮';
+        prevButton.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            border-radius: 5px;
+            z-index: 9999;
+        `;
+
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = '❯';
+        nextButton.style.cssText = `
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            border-radius: 5px;
+            z-index: 9999;
+        `;
+
+        // Add click handlers
+        prevButton.onclick = async () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                const prevDimensions = await getImageDimensions(photos[currentIndex].src);
+                lightbox.options.dataSource = [{
+                    ...photos[currentIndex],
+                    ...prevDimensions
+                }];
+                lightbox.refreshSlideContent(0);
+            }
+        };
+
+        nextButton.onclick = async () => {
+            if (currentIndex < photos.length - 1) {
+                currentIndex++;
+                const nextDimensions = await getImageDimensions(photos[currentIndex].src);
+                lightbox.options.dataSource = [{
+                    ...photos[currentIndex],
+                    ...nextDimensions
+                }];
+                lightbox.refreshSlideContent(0);
+            }
+        };
+
+        // Add buttons to DOM
+        document.body.appendChild(prevButton);
+        document.body.appendChild(nextButton);
+
+        // Clean up on close
+        lightbox.on('destroy', () => {
+            prevButton.remove();
+            nextButton.remove();
+            pswpElement.remove();
+        });
     });
 
     lightbox.on('beforeOpen', () => {
@@ -262,11 +311,8 @@ async function openPhotoSwipe(index, photos) {
     });
 
     lightbox.init();
-    
-    lightbox.on('destroy', () => {
-        pswpElement.remove();
-    });
 }
+
 function switchGallery(type) {
     currentGalleryType = type;
     
