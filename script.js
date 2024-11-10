@@ -222,19 +222,35 @@ function openPhotoSwipe(index, photos) {
     const options = {
         dataSource: photos,
         index: index,
-        closeOnVerticalDrag: true,
-        clickToCloseNonZoomable: true,
-        pswpModule: window.PhotoSwipe,
+        bgOpacity: 0.9,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        imageClickAction: 'zoom',
-        tapAction: 'zoom',
-        preloaderDelay: 0
+        imageClickAction: 'close',
+        tapAction: 'close',
+        preloaderDelay: 0,
+        wheelToZoom: true,
+        initialZoomLevel: 'fit',
+        secondaryZoomLevel: 2,
+        maxZoomLevel: 4,
+        // Add these options for better fit
+        showHideAnimationType: 'fade',
+        showAnimationDuration: 300,
+        hideAnimationDuration: 300,
+        // Force contain mode
+        baseMode: 'fit'
     };
 
     const lightbox = new window.PhotoSwipe(options);
-    lightbox.on('beforeOpen', () => {
-        lightbox.options.initialZoomLevel = 'fit';
+    
+    // Ensure proper sizing before opening
+    lightbox.on('contentLoad', (e) => {
+        const { content } = e;
+        if (content.type === 'image') {
+            // Let PhotoSwipe calculate max zoom based on image and viewport size
+            content.panAreaSize = { x: null, y: null };
+            content.fit = { x: null, y: null };
+        }
     });
+
     lightbox.init();
     
     lightbox.on('destroy', () => {
