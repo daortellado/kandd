@@ -79,34 +79,36 @@ async function getPhotosInDirectory(directory) {
             return [];
         }
         
-        const photos = await Promise.all(data[directory].files.map(async filename => {
+        const photos = data[directory].files.map(filename => {
             const actualDir = dirMap[directory];
             const fileExt = directory === 'wedding' ? 'jpg' : 'png';
             
-            // Load the full image to get its dimensions
-            const img = new Image();
-            const src = `${actualDir}/full/${filename}.${fileExt}`;
-            
-            // Get actual dimensions
-            await new Promise((resolve) => {
-                img.onload = resolve;
-                img.src = src;
-            });
-            
             return {
-                src,
+                src: `${actualDir}/full/${filename}.${fileExt}`,
                 thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
-                width: img.naturalWidth,
-                height: img.naturalHeight,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
-        }));
+        });
         
         return photos;
     } catch (error) {
         console.error(`Error loading ${directory}:`, error);
         return [];
     }
+}
+
+// Get image dimensions when needed
+async function getImageDimensions(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve({
+                width: img.naturalWidth,
+                height: img.naturalHeight
+            });
+        };
+        img.src = src;
+    });
 }
 
 async function initGalleries() {
@@ -127,23 +129,23 @@ async function initGalleries() {
 function setupInfiniteScroll() {
     const options = {
         root: null,
-        rootMargin: '200px', // Increased margin to trigger earlier
+        rootMargin: '200px',
         threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isLoading) {
-                console.log('Loading more photos...'); // Debug log
                 loadMorePhotos(currentGalleryType);
             }
         });
     }, options);
 
-    // Create trigger element outside the grid structure
+    // Create trigger element
     const galleryContainer = document.querySelector('.gallery-container');
     const loadingTrigger = document.createElement('div');
     loadingTrigger.className = 'loading-trigger-wrapper';
+    
     const trigger = document.createElement('div');
     trigger.className = 'loading-trigger';
     loadingTrigger.appendChild(trigger);
@@ -160,16 +162,8 @@ async function loadMorePhotos(type) {
     if (startIndex >= photos.length || isLoading) return;
     
     isLoading = true;
-    
-    const endIndex = Math.min(startIndex + PHOTOS_PER_PAGE, photos.length);
-    
-    // Remove old loading trigger
-    const oldTrigger = gallery.querySelector('.loading-trigger-wrapper');
-    if (oldTrigger) {
-        oldTrigger.remove();
-    }
 
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i < Math.min(startIndex + PHOTOS_PER_PAGE, photos.length); i++) {
         const photo = photos[i];
         const item = document.createElement('div');
         item.className = 'gallery-item';
@@ -184,18 +178,77 @@ async function loadMorePhotos(type) {
         gallery.appendChild(item);
     }
     
-    // Add new loading trigger if there are more photos
-    if (endIndex < photos.length) {
-        const loadingTrigger = document.createElement('div');
-        loadingTrigger.className = 'loading-trigger-wrapper';
-        const trigger = document.createElement('div');
-        trigger.className = 'loading-trigger';
-        loadingTrigger.appendChild(trigger);
-        gallery.appendChild(loadingTrigger);
-    }
-    
     currentPage[type]++;
     isLoading = false;
+
+    // Remove loading indicator if no more photos
+    if (startIndex + PHOTOS_PER_PAGE >= photos.length) {
+        const loadingTrigger = document.querySelector('.loading-trigger-wrapper');
+        if (loadingTrigger) {
+            loadingTrigger.remove();
+        }
+    }
+}
+
+async function openPhotoSwipe(index, photos) {
+    const pswpElement = document.createElement('div');
+    pswpElement.className = 'pswp';
+    document.body.appendChild(pswpElement);
+
+    // Show loading state while getting dimensions
+    const loader = document.createElement('div');
+    loader.style.position = 'fixed';
+    loader.style.top = '50%';
+    loader.style.left = '50%';
+    loader.style.transform = 'translate(-50%, -50%)';
+    loader.style.background = 'rgba(0,0,0,0.8)';
+    loader.style.color = 'white';
+    loader.style.padding = '20px';
+    loader.style.borderRadius = '5px';
+    loader.style.zIndex = '9999';
+    loader.textContent = 'Loading...';
+    document.body.appendChild(loader);
+
+    // Get dimensions for current image
+    const dimensions = await getImageDimensions(photos[index].src);
+    const photoWithDimensions = { ...photos[index], ...dimensions };
+
+    // Remove loader
+    document.body.removeChild(loader);
+
+    const options = {
+        dataSource: [photoWithDimensions], // Start with just the current photo
+        index: 0,
+        closeOnVerticalDrag: true,
+        clickToCloseNonZoomable: true,
+        pswpModule: window.PhotoSwipe,
+        padding: { top: 20, bottom: 20, left: 20, right: 20 },
+        imageClickAction: 'zoom',
+        tapAction: 'zoom',
+        preloaderDelay: 0
+    };
+
+    const lightbox = new window.PhotoSwipe(options);
+    
+    // Load adjacent images' dimensions as needed
+    lightbox.on('beforeChange', async () => {
+        const currentIndex = lightbox.getCurrentIndex();
+        const nextPhoto = photos[currentIndex + 1];
+        if (nextPhoto && !nextPhoto.width) {
+            const nextDimensions = await getImageDimensions(nextPhoto.src);
+            Object.assign(nextPhoto, nextDimensions);
+        }
+    });
+
+    lightbox.on('beforeOpen', () => {
+        lightbox.options.initialZoomLevel = 'fit';
+    });
+
+    lightbox.init();
+    
+    lightbox.on('destroy', () => {
+        pswpElement.remove();
+    });
 }
 
 function switchGallery(type) {
@@ -221,38 +274,6 @@ function switchGallery(type) {
     PHOTOS_PER_PAGE = calculatePhotosPerPage();
     setupInfiniteScroll();
     loadMorePhotos(type);
-}
-
-function openPhotoSwipe(index, photos) {
-    const pswpElement = document.createElement('div');
-    pswpElement.className = 'pswp';
-    document.body.appendChild(pswpElement);
-
-    const options = {
-        dataSource: photos.map(photo => ({
-            ...photo,
-            w: photo.width,
-            h: photo.height
-        })),
-        index: index,
-        closeOnVerticalDrag: true,
-        clickToCloseNonZoomable: true,
-        pswpModule: window.PhotoSwipe,
-        padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        imageClickAction: 'zoom',
-        tapAction: 'zoom',
-        preloaderDelay: 0
-    };
-
-    const lightbox = new window.PhotoSwipe(options);
-    lightbox.on('beforeOpen', () => {
-        lightbox.options.initialZoomLevel = 'fit';
-    });
-    lightbox.init();
-    
-    lightbox.on('destroy', () => {
-        pswpElement.remove();
-    });
 }
 
 function toggleVendors() {
