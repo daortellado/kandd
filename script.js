@@ -195,7 +195,7 @@ async function openPhotoSwipe(index, photos) {
     pswpElement.className = 'pswp';
     document.body.appendChild(pswpElement);
 
-    // Show loading state while getting dimensions
+    // Show loading state
     const loader = document.createElement('div');
     loader.style.position = 'fixed';
     loader.style.top = '50%';
@@ -209,132 +209,47 @@ async function openPhotoSwipe(index, photos) {
     loader.textContent = 'Loading...';
     document.body.appendChild(loader);
 
-    // Get dimensions for current image
-    const dimensions = await getImageDimensions(photos[index].src);
-    const photoWithDimensions = { ...photos[index], ...dimensions };
+    // Pre-load dimensions for visible photos
+    const visiblePhotos = await Promise.all(
+        photos.map(async (photo) => {
+            const dimensions = await getImageDimensions(photo.src);
+            return {
+                ...photo,
+                w: dimensions.width,
+                h: dimensions.height
+            };
+        })
+    );
 
     // Remove loader
     document.body.removeChild(loader);
 
     const options = {
-        dataSource: [photoWithDimensions],
-        index: 0,
+        dataSource: visiblePhotos,
+        index: index,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
         pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
         imageClickAction: 'zoom',
         tapAction: 'zoom',
-        preloaderDelay: 0
+        preloaderDelay: 0,
+        arrowPrev: true,
+        arrowNext: true,
+        arrowKeys: true
     };
 
     const lightbox = new window.PhotoSwipe(options);
     
-    // Add our own navigation buttons after PhotoSwipe is initialized
-    lightbox.on('firstUpdate', () => {
-        let currentIndex = index;
-
-        const prevButton = document.createElement('button');
-        prevButton.innerHTML = '❮';
-        prevButton.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 20px;
-            transform: translateY(-50%);
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            padding: 20px;
-            cursor: pointer;
-            font-size: 24px;
-            border-radius: 5px;
-            z-index: 10000;
-            transition: background-color 0.3s;
-        `;
-
-        const nextButton = document.createElement('button');
-        nextButton.innerHTML = '❯';
-        nextButton.style.cssText = `
-            position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            padding: 20px;
-            cursor: pointer;
-            font-size: 24px;
-            border-radius: 5px;
-            z-index: 10000;
-            transition: background-color 0.3s;
-        `;
-
-        // Add hover effects
-        const addHoverEffects = (button) => {
-            button.onmouseover = () => button.style.backgroundColor = 'rgba(0,0,0,0.8)';
-            button.onmouseout = () => button.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        };
-
-        addHoverEffects(prevButton);
-        addHoverEffects(nextButton);
-
-        // Add click handlers with stopPropagation
-        prevButton.onclick = async (e) => {
-            e.stopPropagation();
-            if (currentIndex > 0) {
-                currentIndex--;
-                loader.style.display = 'block';
-                const prevDimensions = await getImageDimensions(photos[currentIndex].src);
-                lightbox.options.dataSource = [{
-                    ...photos[currentIndex],
-                    ...prevDimensions
-                }];
-                lightbox.refreshSlideContent(0);
-                loader.style.display = 'none';
-            }
-        };
-
-        nextButton.onclick = async (e) => {
-            e.stopPropagation();
-            if (currentIndex < photos.length - 1) {
-                currentIndex++;
-                loader.style.display = 'block';
-                const nextDimensions = await getImageDimensions(photos[currentIndex].src);
-                lightbox.options.dataSource = [{
-                    ...photos[currentIndex],
-                    ...nextDimensions
-                }];
-                lightbox.refreshSlideContent(0);
-                loader.style.display = 'none';
-            }
-        };
-
-        // Add the buttons to PhotoSwipe's container instead of body
-        const pswpContainer = pswpElement.querySelector('.pswp__container');
-        pswpContainer.appendChild(prevButton);
-        pswpContainer.appendChild(nextButton);
-
-        // Hide prev/next buttons at boundaries
-        const updateButtonVisibility = () => {
-            prevButton.style.display = currentIndex === 0 ? 'none' : 'block';
-            nextButton.style.display = currentIndex === photos.length - 1 ? 'none' : 'block';
-        };
-        updateButtonVisibility();
-
-        // Clean up on close
-        lightbox.on('destroy', () => {
-            prevButton.remove();
-            nextButton.remove();
-            pswpElement.remove();
-        });
-    });
-
     lightbox.on('beforeOpen', () => {
         lightbox.options.initialZoomLevel = 'fit';
     });
 
     lightbox.init();
+    
+    lightbox.on('destroy', () => {
+        pswpElement.remove();
+    });
 }
 
 function switchGallery(type) {
