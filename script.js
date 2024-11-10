@@ -217,26 +217,34 @@ async function openPhotoSwipe(index, photos) {
     document.body.removeChild(loader);
 
     const options = {
-        dataSource: [photoWithDimensions], // Start with just the current photo
-        index: 0,
+        dataSource: photos,  // Use all photos instead of just one
+        index: index,        // Keep track of the current index
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
         pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
         imageClickAction: 'zoom',
         tapAction: 'zoom',
-        preloaderDelay: 0
+        preloaderDelay: 0,
+        arrowKeys: true,    // Enable keyboard arrows
+        arrowPrev: true,    // Show previous arrow
+        arrowNext: true,    // Show next arrow
+        arrowPrevTitle: 'Previous', // Tooltip for previous button
+        arrowNextTitle: 'Next',     // Tooltip for next button
     };
 
     const lightbox = new window.PhotoSwipe(options);
     
-    // Load adjacent images' dimensions as needed
+    // Load adjacent images' dimensions
     lightbox.on('beforeChange', async () => {
         const currentIndex = lightbox.getCurrentIndex();
-        const nextPhoto = photos[currentIndex + 1];
-        if (nextPhoto && !nextPhoto.width) {
-            const nextDimensions = await getImageDimensions(nextPhoto.src);
-            Object.assign(nextPhoto, nextDimensions);
+        // Get dimensions for next and previous images if they exist
+        const adjacentIndices = [currentIndex - 1, currentIndex + 1];
+        for (const idx of adjacentIndices) {
+            if (idx >= 0 && idx < photos.length && !photos[idx].width) {
+                const dimensions = await getImageDimensions(photos[idx].src);
+                Object.assign(photos[idx], dimensions);
+            }
         }
     });
 
