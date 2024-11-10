@@ -223,21 +223,11 @@ function openPhotoSwipe(index, photos) {
         pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
         showHideAnimationType: 'fade',
-        // These are the key settings for maintaining aspect ratio
-        wheelToZoom: true,
-        zoom: {
-            fit: true,
-            scaleMode: 'fit'
-        }
+        closeOnVerticalDrag: true,
+        // Remove all zoom and fit options to let PhotoSwipe handle it naturally
     };
 
     const lightbox = new window.PhotoSwipe(options);
-    
-    // Force 'fit' mode on open
-    lightbox.on('beforeOpen', () => {
-        lightbox.fit = true;
-    });
-
     lightbox.init();
     
     lightbox.on('destroy', () => {
