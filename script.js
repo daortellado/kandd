@@ -217,7 +217,7 @@ async function openPhotoSwipe(index, photos) {
     document.body.removeChild(loader);
 
     const options = {
-        dataSource: [photoWithDimensions], // Keep single photo for correct aspect ratio
+        dataSource: [photoWithDimensions],
         index: 0,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
@@ -234,7 +234,6 @@ async function openPhotoSwipe(index, photos) {
     lightbox.on('firstUpdate', () => {
         let currentIndex = index;
 
-        // Create and style navigation buttons
         const prevButton = document.createElement('button');
         prevButton.innerHTML = '❮';
         prevButton.style.cssText = `
@@ -249,7 +248,8 @@ async function openPhotoSwipe(index, photos) {
             cursor: pointer;
             font-size: 24px;
             border-radius: 5px;
-            z-index: 9999;
+            z-index: 10000;
+            transition: background-color 0.3s;
         `;
 
         const nextButton = document.createElement('button');
@@ -266,37 +266,61 @@ async function openPhotoSwipe(index, photos) {
             cursor: pointer;
             font-size: 24px;
             border-radius: 5px;
-            z-index: 9999;
+            z-index: 10000;
+            transition: background-color 0.3s;
         `;
 
-        // Add click handlers
-        prevButton.onclick = async () => {
+        // Add hover effects
+        const addHoverEffects = (button) => {
+            button.onmouseover = () => button.style.backgroundColor = 'rgba(0,0,0,0.8)';
+            button.onmouseout = () => button.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        };
+
+        addHoverEffects(prevButton);
+        addHoverEffects(nextButton);
+
+        // Add click handlers with stopPropagation
+        prevButton.onclick = async (e) => {
+            e.stopPropagation();
             if (currentIndex > 0) {
                 currentIndex--;
+                loader.style.display = 'block';
                 const prevDimensions = await getImageDimensions(photos[currentIndex].src);
                 lightbox.options.dataSource = [{
                     ...photos[currentIndex],
                     ...prevDimensions
                 }];
                 lightbox.refreshSlideContent(0);
+                loader.style.display = 'none';
             }
         };
 
-        nextButton.onclick = async () => {
+        nextButton.onclick = async (e) => {
+            e.stopPropagation();
             if (currentIndex < photos.length - 1) {
                 currentIndex++;
+                loader.style.display = 'block';
                 const nextDimensions = await getImageDimensions(photos[currentIndex].src);
                 lightbox.options.dataSource = [{
                     ...photos[currentIndex],
                     ...nextDimensions
                 }];
                 lightbox.refreshSlideContent(0);
+                loader.style.display = 'none';
             }
         };
 
-        // Add buttons to DOM
-        document.body.appendChild(prevButton);
-        document.body.appendChild(nextButton);
+        // Add the buttons to PhotoSwipe's container instead of body
+        const pswpContainer = pswpElement.querySelector('.pswp__container');
+        pswpContainer.appendChild(prevButton);
+        pswpContainer.appendChild(nextButton);
+
+        // Hide prev/next buttons at boundaries
+        const updateButtonVisibility = () => {
+            prevButton.style.display = currentIndex === 0 ? 'none' : 'block';
+            nextButton.style.display = currentIndex === photos.length - 1 ? 'none' : 'block';
+        };
+        updateButtonVisibility();
 
         // Clean up on close
         lightbox.on('destroy', () => {
