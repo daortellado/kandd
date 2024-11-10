@@ -83,12 +83,14 @@ async function getPhotosInDirectory(directory) {
             const actualDir = dirMap[directory];
             const fileExt = directory === 'wedding' ? 'jpg' : 'png';
             
-            return {
+            const photo = {
                 src: `${actualDir}/full/${filename}.${fileExt}`,
                 thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
-                // Remove hardcoded dimensions to let PhotoSwipe calculate them
+                width: directory === 'wedding' ? 1500 : 600,
+                height: directory === 'wedding' ? 1000 : 900,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
+            return photo;
         });
         
         return photos;
@@ -220,14 +222,36 @@ function openPhotoSwipe(index, photos) {
     const options = {
         dataSource: photos,
         index: index,
+        closeOnVerticalDrag: true,
+        clickToCloseNonZoomable: true,
         pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        showHideAnimationType: 'fade',
-        closeOnVerticalDrag: true,
-        // Remove all zoom and fit options to let PhotoSwipe handle it naturally
+        imageClickAction: 'zoom',
+        tapAction: 'zoom',
+        preloaderDelay: 0
     };
 
     const lightbox = new window.PhotoSwipe(options);
+
+    // Handle image loading to set proper dimensions
+    lightbox.on('contentLoad', (e) => {
+        const { content } = e;
+        if (content.type === 'image') {
+            const img = new Image();
+            img.src = content.data.src;
+            img.onload = () => {
+                const isPortrait = img.naturalHeight > img.naturalWidth;
+                if (isPortrait) {
+                    content.zoomLevel = 'fit'; // Force fit for portrait images
+                }
+            };
+        }
+    });
+
+    lightbox.on('beforeOpen', () => {
+        lightbox.options.initialZoomLevel = 'fit';
+    });
+
     lightbox.init();
     
     lightbox.on('destroy', () => {
