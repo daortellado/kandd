@@ -220,42 +220,22 @@ function openPhotoSwipe(index, photos) {
     const options = {
         dataSource: photos,
         index: index,
+        pswpModule: window.PhotoSwipe,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        clickToCloseNonZoomable: true,
-        imageClickAction: 'toggle-zoom',
-        tapAction: 'toggle-zoom',
-        preloaderDelay: 0,
-        bgOpacity: 0.9,
         showHideAnimationType: 'fade',
-        allowPanToNext: true,
-        allowMouseDrag: true,
-        // Always fit image to screen initially
-        zoom: false
+        // These are the key settings for maintaining aspect ratio
+        wheelToZoom: true,
+        zoom: {
+            fit: true,
+            scaleMode: 'fit'
+        }
     };
 
     const lightbox = new window.PhotoSwipe(options);
-
-    // Handle image loading
-    lightbox.on('contentLoad', (e) => {
-        const { content } = e;
-        if (content.type === 'image') {
-            // Create temporary image to get real dimensions
-            const img = new Image();
-            img.src = content.data.src;
-            img.onload = () => {
-                content.width = img.naturalWidth;
-                content.height = img.naturalHeight;
-            };
-        }
-    });
-
-    // Ensure proper initial display
+    
+    // Force 'fit' mode on open
     lightbox.on('beforeOpen', () => {
-        lightbox.viewportSize = {
-            x: window.innerWidth,
-            y: window.innerHeight
-        };
-        lightbox.zoomTo(1, { x: window.innerWidth/2, y: window.innerHeight/2 }, 0);
+        lightbox.fit = true;
     });
 
     lightbox.init();
@@ -264,6 +244,7 @@ function openPhotoSwipe(index, photos) {
         pswpElement.remove();
     });
 }
+
 function toggleVendors() {
     const vendorList = document.getElementById('vendorList');
     const toggle = document.querySelector('.vendor-toggle');
