@@ -79,19 +79,28 @@ async function getPhotosInDirectory(directory) {
             return [];
         }
         
-        const photos = data[directory].files.map(filename => {
+        const photos = await Promise.all(data[directory].files.map(async filename => {
             const actualDir = dirMap[directory];
             const fileExt = directory === 'wedding' ? 'jpg' : 'png';
             
-            const photo = {
-                src: `${actualDir}/full/${filename}.${fileExt}`,
+            // Load the full image to get its dimensions
+            const img = new Image();
+            const src = `${actualDir}/full/${filename}.${fileExt}`;
+            
+            // Get actual dimensions
+            await new Promise((resolve) => {
+                img.onload = resolve;
+                img.src = src;
+            });
+            
+            return {
+                src,
                 thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
-                width: directory === 'wedding' ? 1500 : 600,
-                height: directory === 'wedding' ? 1000 : 900,
+                width: img.naturalWidth,
+                height: img.naturalHeight,
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
-            return photo;
-        });
+        }));
         
         return photos;
     } catch (error) {
@@ -220,7 +229,11 @@ function openPhotoSwipe(index, photos) {
     document.body.appendChild(pswpElement);
 
     const options = {
-        dataSource: photos,
+        dataSource: photos.map(photo => ({
+            ...photo,
+            w: photo.width,
+            h: photo.height
+        })),
         index: index,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
@@ -232,26 +245,9 @@ function openPhotoSwipe(index, photos) {
     };
 
     const lightbox = new window.PhotoSwipe(options);
-
-    // Handle image loading to set proper dimensions
-    lightbox.on('contentLoad', (e) => {
-        const { content } = e;
-        if (content.type === 'image') {
-            const img = new Image();
-            img.src = content.data.src;
-            img.onload = () => {
-                const isPortrait = img.naturalHeight > img.naturalWidth;
-                if (isPortrait) {
-                    content.zoomLevel = 'fit'; // Force fit for portrait images
-                }
-            };
-        }
-    });
-
     lightbox.on('beforeOpen', () => {
         lightbox.options.initialZoomLevel = 'fit';
     });
-
     lightbox.init();
     
     lightbox.on('destroy', () => {
