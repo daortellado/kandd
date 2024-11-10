@@ -217,8 +217,8 @@ async function openPhotoSwipe(index, photos) {
     document.body.removeChild(loader);
 
     const options = {
-        dataSource: photos,  // Use all photos instead of just one
-        index: index,        // Keep track of the current index
+        dataSource: [photoWithDimensions],
+        index: 0,
         closeOnVerticalDrag: true,
         clickToCloseNonZoomable: true,
         pswpModule: window.PhotoSwipe,
@@ -226,26 +226,52 @@ async function openPhotoSwipe(index, photos) {
         imageClickAction: 'zoom',
         tapAction: 'zoom',
         preloaderDelay: 0,
-        arrowKeys: true,    // Enable keyboard arrows
-        arrowPrev: true,    // Show previous arrow
-        arrowNext: true,    // Show next arrow
-        arrowPrevTitle: 'Previous', // Tooltip for previous button
-        arrowNextTitle: 'Next',     // Tooltip for next button
+        showPrevNextButtons: true,
+        arrowPrev: true,
+        arrowNext: true
     };
 
     const lightbox = new window.PhotoSwipe(options);
     
-    // Load adjacent images' dimensions
-    lightbox.on('beforeChange', async () => {
-        const currentIndex = lightbox.getCurrentIndex();
-        // Get dimensions for next and previous images if they exist
-        const adjacentIndices = [currentIndex - 1, currentIndex + 1];
-        for (const idx of adjacentIndices) {
-            if (idx >= 0 && idx < photos.length && !photos[idx].width) {
-                const dimensions = await getImageDimensions(photos[idx].src);
-                Object.assign(photos[idx], dimensions);
+    let currentIndex = index;
+
+    // Handle navigation
+    lightbox.on('uiRegister', () => {
+        lightbox.ui.registerElement({
+            name: 'custom-next',
+            order: 9,
+            isButton: true,
+            html: '<button class="pswp__button pswp__button--arrow--next" title="Next">Next</button>',
+            onClick: async () => {
+                if (currentIndex < photos.length - 1) {
+                    currentIndex++;
+                    const nextDimensions = await getImageDimensions(photos[currentIndex].src);
+                    lightbox.options.dataSource = [{
+                        ...photos[currentIndex],
+                        ...nextDimensions
+                    }];
+                    lightbox.refreshSlideContent(0);
+                }
             }
-        }
+        });
+
+        lightbox.ui.registerElement({
+            name: 'custom-prev',
+            order: 8,
+            isButton: true,
+            html: '<button class="pswp__button pswp__button--arrow--prev" title="Previous">Previous</button>',
+            onClick: async () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    const prevDimensions = await getImageDimensions(photos[currentIndex].src);
+                    lightbox.options.dataSource = [{
+                        ...photos[currentIndex],
+                        ...prevDimensions
+                    }];
+                    lightbox.refreshSlideContent(0);
+                }
+            }
+        });
     });
 
     lightbox.on('beforeOpen', () => {
