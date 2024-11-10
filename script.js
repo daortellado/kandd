@@ -83,14 +83,12 @@ async function getPhotosInDirectory(directory) {
             const actualDir = dirMap[directory];
             const fileExt = directory === 'wedding' ? 'jpg' : 'png';
             
-            const photo = {
+            return {
                 src: `${actualDir}/full/${filename}.${fileExt}`,
                 thumb: `${actualDir}/thumbs/${filename}_thumb.${fileExt}`,
-                width: directory === 'wedding' ? 1500 : 600,
-                height: directory === 'wedding' ? 1000 : 900,
+                // Remove hardcoded dimensions to let PhotoSwipe calculate them
                 alt: directory === 'wedding' ? 'Wedding Photo' : 'Photobooth Strip'
             };
-            return photo;
         });
         
         return photos;
@@ -222,33 +220,42 @@ function openPhotoSwipe(index, photos) {
     const options = {
         dataSource: photos,
         index: index,
-        bgOpacity: 0.9,
         padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        imageClickAction: 'close',
-        tapAction: 'close',
+        clickToCloseNonZoomable: true,
+        imageClickAction: 'toggle-zoom',
+        tapAction: 'toggle-zoom',
         preloaderDelay: 0,
-        wheelToZoom: true,
-        initialZoomLevel: 'fit',
-        secondaryZoomLevel: 2,
-        maxZoomLevel: 4,
-        // Add these options for better fit
+        bgOpacity: 0.9,
         showHideAnimationType: 'fade',
-        showAnimationDuration: 300,
-        hideAnimationDuration: 300,
-        // Force contain mode
-        baseMode: 'fit'
+        allowPanToNext: true,
+        allowMouseDrag: true,
+        // Always fit image to screen initially
+        zoom: false
     };
 
     const lightbox = new window.PhotoSwipe(options);
-    
-    // Ensure proper sizing before opening
+
+    // Handle image loading
     lightbox.on('contentLoad', (e) => {
         const { content } = e;
         if (content.type === 'image') {
-            // Let PhotoSwipe calculate max zoom based on image and viewport size
-            content.panAreaSize = { x: null, y: null };
-            content.fit = { x: null, y: null };
+            // Create temporary image to get real dimensions
+            const img = new Image();
+            img.src = content.data.src;
+            img.onload = () => {
+                content.width = img.naturalWidth;
+                content.height = img.naturalHeight;
+            };
         }
+    });
+
+    // Ensure proper initial display
+    lightbox.on('beforeOpen', () => {
+        lightbox.viewportSize = {
+            x: window.innerWidth,
+            y: window.innerHeight
+        };
+        lightbox.zoomTo(1, { x: window.innerWidth/2, y: window.innerHeight/2 }, 0);
     });
 
     lightbox.init();
@@ -257,7 +264,6 @@ function openPhotoSwipe(index, photos) {
         pswpElement.remove();
     });
 }
-
 function toggleVendors() {
     const vendorList = document.getElementById('vendorList');
     const toggle = document.querySelector('.vendor-toggle');
